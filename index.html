@@ -1,0 +1,3262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UPEI Security Services - Incident Reporting Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- jsPDF for PDF export -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <!-- html2canvas for form rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --upei-maroon: #8B0000;
+      --upei-green: #84BD00;
+      --upei-gold: #D4AF37;
+      --upei-navy: #1A3A5C;
+      --upei-background: #f5f5f5;
+      --upei-text: #333333;
+      --upei-border: #d9d9d9;
+      --upei-light: #ffffff;
+      --upei-success: #84BD00;
+      --upei-danger: #8B0000;
+    }
+    
+    body {
+      background: var(--upei-background);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Segoe UI', 'Trebuchet MS', Arial, sans-serif;
+      color: var(--upei-text);
+    }
+    
+    .header-container {
+      background: var(--upei-maroon);
+      color: white;
+      padding: 2rem 0 1.5rem 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+      border-bottom: 4px solid var(--upei-gold);
+    }
+    
+    .upei-logo {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 4px;
+      padding: 8px;
+      margin-right: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: var(--upei-maroon);
+      font-size: 1.2rem;
+      border: 2px solid var(--upei-gold);
+    }
+    
+
+    
+    .institution-name {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 0.85rem;
+      color: white;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+      font-weight: 400;
+    }
+    
+    #branding {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-weight: 600;
+      font-size: 1.5rem;
+      color: white;
+      letter-spacing: 0.3px;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    #branding i {
+      font-size: 1.5rem;
+      color: var(--upei-gold);
+    }
+    
+    .department-subtitle {
+      font-size: 0.9rem;
+      color: var(--upei-gold);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+    
+    .date-time-display {
+      font-size: 0.95rem;
+      opacity: 0.95;
+      font-weight: 400;
+    }
+    
+    .stepper {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+      padding: 0.5rem 0;
+    }
+    
+    .stepper-step {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      min-width: 140px;
+    }
+    
+    .stepper-step .circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #dee2e6;
+      color: #636466;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      border: 3px solid transparent;
+      z-index: 2;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .stepper-step.active .circle {
+      background: var(--upei-maroon);
+      color: #fff;
+      border: 3px solid var(--upei-maroon);
+      box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.2);
+      transform: scale(1.05);
+    }
+    
+    .stepper-step.finished .circle {
+      background: var(--upei-success) !important;
+      color: #fff;
+      border: 3px solid var(--upei-success);
+    }
+    
+    .stepper-step .label {
+      font-size: 0.9rem;
+      color: #6c757d;
+      text-align: center;
+      font-weight: 500;
+    }
+    
+    .stepper-step.active .label {
+      color: var(--upei-maroon);
+      font-weight: 600;
+    }
+    
+    .stepper-step.finished .label {
+      color: var(--upei-success);
+    }
+    
+    .stepper-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 100%;
+      top: 21px;
+      height: 4px;
+      width: calc(100% - 44px);
+      background: #dee2e6;
+      z-index: 1;
+    }
+    
+    .stepper-step.finished:not(:last-child)::after {
+      background: var(--upei-success);
+    }
+    
+    .section-blue {background: rgba(139, 0, 0, 0.04); border-left: 4px solid var(--upei-maroon);}
+    .section-green {background: rgba(132, 189, 0, 0.04); border-left: 4px solid var(--upei-green);}
+    .section-grey {background: white; border: 1px solid var(--upei-border); border-left: 4px solid var(--upei-gold);}
+    
+    .form-section {
+      border-radius: 2px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.2s;
+      background: white;
+      border: 1px solid var(--upei-border);
+    }
+    
+    .form-section:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+    
+    .form-section h5 {
+      color: var(--upei-maroon);
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      font-size: 1.1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--upei-border);
+    }
+    
+    .form-label {
+      font-weight: 500;
+      color: var(--upei-text);
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    
+    .form-control:focus {
+      border-color: var(--upei-maroon);
+      box-shadow: 0 0 0 0.2rem rgba(139, 0, 0, 0.15);
+    }
+    
+    .form-control {
+      border: 1px solid var(--upei-border);
+      border-radius: 2px;
+      font-size: 0.95rem;
+    }
+    
+    .btn-primary {
+      background: var(--upei-maroon);
+      border-color: var(--upei-maroon);
+      font-weight: 500;
+      padding: 0.5rem 1.5rem;
+      transition: all 0.2s;
+      border-radius: 2px;
+    }
+    
+    .btn-primary:hover {
+      background: #6B0000;
+      border-color: #6B0000;
+      box-shadow: 0 2px 6px rgba(139, 0, 0, 0.3);
+    }
+    
+    .btn-success {
+      background: var(--upei-green);
+      border-color: var(--upei-green);
+      font-weight: 500;
+      border-radius: 2px;
+    }
+    
+    .btn-success:hover {
+      background: #6FA000;
+      border-color: #6FA000;
+      box-shadow: 0 2px 6px rgba(132, 189, 0, 0.3);
+    }
+    
+    .btn-outline-primary {
+      color: var(--upei-maroon);
+      border-color: var(--upei-maroon);
+      border-radius: 2px;
+    }
+    
+    .btn-outline-primary:hover {
+      background: var(--upei-maroon);
+      border-color: var(--upei-maroon);
+      color: white;
+    }
+    
+    .btn-outline-success {
+      color: var(--upei-green);
+      border-color: var(--upei-green);
+      border-radius: 2px;
+    }
+    
+    .btn-outline-success:hover {
+      background: var(--upei-green);
+      border-color: var(--upei-green);
+      color: white;
+    }
+    
+    .witness-container {
+      border: 1px solid var(--upei-border);
+      border-radius: 2px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: rgba(139, 0, 0, 0.02);
+    }
+    
+    footer {
+      background: var(--upei-maroon);
+      color: #fff;
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: auto;
+      font-size: 0.9rem;
+      letter-spacing: 0.3px;
+      border-top: 3px solid var(--upei-gold);
+    }
+    
+    footer .contact-info {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--upei-gold);
+    }
+    
+    footer .version {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-top: 0.25rem;
+    }
+    
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+    
+    .toast {
+      min-width: 300px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .admin-report-card {
+      transition: all 0.2s;
+      border-left: 4px solid var(--upei-maroon);
+ 
+    
+    .admin-report-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateX(4px);
+    }
+    
+    .report-id {
+      font-family: 'Courier New', monospace;
+      background: rgba(139, 0, 0, 0.08);
+      padding: 0.25rem 0.5rem;
+      border-radius: 2px;
+      font-size: 0.9rem;
+      color: var(--upei-maroon);
+      border: 1px solid var(--upei-border);
+    }
+    
+    .storage-warning {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 0.5rem;
+    }
+    
+    .print-only {
+      display: none;
+    }
+    
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+      
+      .header-container,
+      .stepper,
+      button,
+      .btn,
+      #adminPanel,
+      footer,
+      .no-print,
+      .cctv-poi-questions {
+        display: none !important;
+      }
+      
+      .print-only {
+        display: block !important;
+      }
+      
+      .form-section {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #dee2e6;
+        margin-bottom: 1.5rem;
+        background: white !important;
+      }
+      
+      .printable-form {
+        page-break-after: always;
+        margin-bottom: 2rem;
+      }
+      
+      .printable-form:last-child {
+        page-break-after: auto;
+      }
+      
+      .container {
+        max-width: 100%;
+      }
+      
+      h1, h2, h3, h4, h5 {
+        page-break-after: avoid;
+        color: black !important;
+      }
+      
+      .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #333;
+      }
+      
+      .print-header h1 {
+        color: black;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 3px solid #888;
+        padding-bottom: 0.5rem;
+      }
+      
+      .print-footer {
+        display: block !important;
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #dee2e6;
+        font-size: 0.85rem;
+        color: black;
+      }
+      
+      .form-label {
+        font-weight: bold;
+        color: black;
+      }
+      
+      .form-data-display {
+        border: 1px solid #dee2e6;
+        padding: 0.5rem;
+        margin-bottom: 0.75rem;
+        background: #f9f9f9;
+      }
+    }
+    
+    .file-preview-container {
+      margin-top: 0.75rem;
+      border: 1px solid var(--upei-border);
+      border-radius: 4px;
+      padding: 0.75rem;
+      background: rgba(139, 0, 0, 0.02);
+    }
+    
+    .file-preview-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .file-preview-img {
+      max-width: 120px;
+      max-height: 120px;
+      border: 2px solid var(--upei-border);
+      border-radius: 4px;
+      object-fit: cover;
+    }
+    
+    .file-preview-info {
+      flex: 1;
+    }
+    
+    .btn-remove-file {
+      background: var(--upei-danger);
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    
+    .btn-remove-file:hover {
+      background: #6B0000;
+      box-shadow: 0 2px 6px rgba(139, 0, 0, 0.3);
+    }
+    
+    @media (max-width: 768px) {
+      .form-section {padding: 1.25rem;}
+      #branding {font-size: 1.35rem;}
+      .stepper-step {min-width: 100px;}
+      .stepper-step .label {font-size: 0.8rem;}
+      .contact-banner {padding: 0.75rem 0;}
+      .contact-item {font-size: 0.8rem; padding: 0.4rem;}
+      .contact-item strong {display: block; margin-bottom: 0.25rem;}
+      .file-preview-item {flex-direction: column; align-items: flex-start;}
+    }
+  </style>
+</head>
+<body>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+  
+  <!-- Print Header (hidden on screen) -->
+  <div class="print-header" style="display: none;">
+    <h1>UPEI Security Services - Incident Report</h1>
+    <p id="printTimestamp"></p>
+  </div>
+  
+  <div class="header-container no-print">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-start flex-wrap">
+        <div class="d-flex align-items-center">
+          <div class="upei-logo">
+            <span>UPEI</span>
+          </div>
+          <div>
+            <div class="institution-name">UNIVERSITY OF PRINCE EDWARD ISLAND</div>
+            <div id="branding">
+              <i class="bi bi-shield-fill-exclamation"></i>
+              <span>Security Services</span>
+            </div>
+            <div class="department-subtitle">Incident Reporting Portal</div>
+            <div class="date-time-display" id="dateTimeDisplay"></div>
+          </div>
+        </div>
+        <div class="mt-2 mt-md-0">
+          <button class="btn btn-sm btn-light" onclick="toggleAdminMode()">
+            <i class="bi bi-person-badge"></i> Admin Review
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  
+  <div class="container my-4">
+    <!-- Storage Warning -->
+    <div class="storage-warning no-print" id="storageWarning">
+      <i class="bi bi-exclamation-triangle"></i>
+      <strong>Note:</strong> Reports are stored temporarily in memory. Data will be lost when you close or refresh this page. For permanent storage, please export reports as PDF.
+    </div>
+    
+    <!-- Progress Stepper -->
+    <div class="stepper" id="progressStepper"></div>
+    
+    <form id="incidentForm" autocomplete="off">
+      <!-- Dynamic form sections appear here -->
+    </form>
+    
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="d-none">
+      <div class="form-section section-blue">
+        <h4 class="mb-3"><i class="bi bi-folder2-open"></i> Submitted Reports</h4>
+        
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="searchReports" placeholder="Search reports...">
+          </div>
+          <div class="col-md-3">
+            <select class="form-control" id="filterType" onchange="renderAdminReports()">
+              <option value="">All Types</option>
+              <option value="incident">Incident Report</option>
+              <option value="intake">Intake Form</option>
+            </select>
+          </div>
+          <div class="col-md-5 text-end">
+            <button class="btn btn-sm btn-success me-2" onclick="exportAllReportsJSON()">
+              <i class="bi bi-download"></i> Export All (JSON)
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="clearAllReports()">
+              <i class="bi bi-trash"></i> Clear All
+            </button>
+          </div>
+        </div>
+        
+        <div id="reportStats" class="mb-3 p-3 bg-light rounded">
+          <div class="row text-center">
+            <div class="col-md-3">
+              <h5 id="totalReports">0</h5>
+              <small>Total Reports</small>
+            </div>
+            <div class="col-md-3">
+              <h5 id="incidentReports">0</h5>
+              <small>Incident Reports</small>
+            </div>
+            <div class="col-md-3">
+              <h5 id="intakeReports">0</h5>
+              <small>Intake Forms</small>
+            </div>
+            <div class="col-md-3">
+              <h5 id="todayReports">0</h5>
+              <small>Today</small>
+            </div>
+          </div>
+        </div>
+        
+        <div id="adminReports" class="mb-4"></div>
+        
+        <button class="btn btn-secondary" onclick="toggleAdminMode()">
+          <i class="bi bi-arrow-counterclockwise"></i> Exit Admin Mode
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Print Footer (hidden on screen) -->
+  <div class="print-footer" style="display: none;">
+    <p>&copy; 2025 UPEI Security Services &bull; Confidential</p>
+  </div>
+  
+  <footer class="no-print">
+    <strong>&copy; 2025 University of Prince Edward Island</strong><br>
+    Security Services - Incident Reporting Portal
+    <div class="contact-info">
+      <strong>Security Services:</strong> 
+      <a href="tel:902-566-0384" style="color: var(--upei-gold); text-decoration: none;">
+        <i class="bi bi-telephone-fill"></i> 902-566-0384
+      </a> &nbsp;&bull;&nbsp; 
+      <a href="mailto:security@upei.ca" style="color: var(--upei-gold); text-decoration: none;">
+        <i class="bi bi-envelope-fill"></i> security@upei.ca
+      </a>
+      <br>
+      <strong>Incident Reporting:</strong> 
+      <a href="tel:902-566-0901" style="color: var(--upei-gold); text-decoration: none;">
+        <i class="bi bi-telephone-fill"></i> 902-566-0901
+      </a> &nbsp;&bull;&nbsp; 
+      <a href="mailto:incident@upei.ca" style="color: var(--upei-gold); text-decoration: none;">
+        <i class="bi bi-envelope-fill"></i> incident@upei.ca
+      </a>
+    </div>
+    <div class="version">Version 1.0.0 &bull; Confidential Document</div>
+  </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // SOP Steps Configuration
+    const SOP_STEPS = [
+      { label: "Initial Routing" },
+      { label: "Incident Details" },
+      { label: "Type Selection" },
+      { label: "Specialized Forms" },
+      { label: "CCTV/POI" },
+      { label: "Summary & Export" }
+    ];
+    
+    // Form Library Configuration
+    const FORM_LIB = {
+      incident: {
+        title: "Incident Report",
+        color: "section-grey",
+        icon: "bi-journal-text"
+      },
+      intake: {
+        title: "Intake Form",
+        color: "section-grey",
+        icon: "bi-person-lines-fill"
+      },
+      hs: {
+        title: "Health & Safety Report",
+        color: "section-green",
+        icon: "bi-heart-pulse-fill"
+      },
+      criminal: {
+        title: "RCMP/CPS Referral",
+        color: "section-blue",
+        icon: "bi-shield-lock-fill"
+      },
+      cctv: {
+        title: "CCTV Request Form",
+        color: "section-blue",
+        icon: "bi-camera-video"
+      },
+      poi: {
+        title: "POI (Person of Interest) Form",
+        color: "section-grey",
+        icon: "bi-person-badge"
+      }
+    };
+    
+    // Application State
+    let sopState = {
+      stepIdx: 0,
+      routing: null,
+      incidentType: null,
+      hsOrCriminal: null,
+      cctvAvailable: false,
+      poiAvailable: false,
+      rcmpSelected: false,
+      cpsSelected: false,
+      forms: {},
+      adminMode: false,
+      reportId: null
+    };
+    
+    // In-memory storage for reports (replaces localStorage)
+    let incidentReports = [];
+    
+    // Auto-save interval
+    let autoSaveInterval = null;
+    
+    // === UTILITY FUNCTIONS ===
+    
+    function generateReportId(dispatchLog) {
+      const date = new Date();
+      const dateStr = date.toISOString().split('T')[0];
+      
+      if (!dispatchLog || dispatchLog.trim() === '') {
+        throw new Error('Dispatch Log number is missing. Cannot generate report ID.');
+      }
+      
+      return `UPEI-${dateStr}-${dispatchLog.trim()}`;
+    }
+    
+    function updateDateTime() {
+      const now = new Date();
+      const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      };
+      document.getElementById('dateTimeDisplay').textContent = now.toLocaleString('en-US', options);
+    }
+    
+    function validateDispatchLog() {
+      const dispatchLog = sopState.forms['incident']?.dispatch_log;
+      
+      if (!dispatchLog || dispatchLog.trim() === '') {
+        alert('Error: Dispatch Log number is missing. Please fill in the Dispatch Log field in the Incident Report.');
+        return false;
+      }
+      
+      return true;
+    }
+    
+    function showToast(message, type = 'success') {
+      const toastContainer = document.getElementById('toastContainer');
+      const toastId = 'toast-' + Date.now();
+      const iconMap = {
+        success: 'check-circle-fill',
+        error: 'exclamation-circle-fill',
+        warning: 'exclamation-triangle-fill',
+        info: 'info-circle-fill'
+      };
+      
+      const toast = document.createElement('div');
+      toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type} border-0`;
+      toast.id = toastId;
+      toast.setAttribute('role', 'alert');
+      toast.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="bi bi-${iconMap[type]} me-2"></i>${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      `;
+      
+      toastContainer.appendChild(toast);
+      const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+      bsToast.show();
+      
+      toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+      });
+    }
+    
+    function focusFirstInput() {
+      setTimeout(() => {
+        const firstInput = document.querySelector('#incidentForm input, #incidentForm textarea, #incidentForm select');
+        if (firstInput) firstInput.focus();
+      }, 100);
+    }
+    
+    // === AUTO SAVE & RESTORE HELPERS ===
+let autoSaveInitialized = false;
+
+function getCurrentFormKey() {
+  if (sopState.stepIdx === 1) {
+    return sopState.routing === 'dispatch' ? 'incident' : 'intake';
+  } else if (sopState.stepIdx === 3) {
+    return sopState.hsOrCriminal === 'hs' ? 'hs' : 'criminal';
+  } else if (sopState.stepIdx === 4) {
+    if (sopState.cctvAvailable && sopState.poiAvailable) {
+      // We will decide based on the field prefix during autosave
+      return null;
+    }
+    if (sopState.cctvAvailable) return 'cctv';
+    if (sopState.poiAvailable) return 'poi';
+  }
+  return null;
+}
+
+// Handler that triggers on every input/change inside #incidentForm
+function handleAutoSave(e) {
+  if (!e.target.closest || !e.target.closest('#incidentForm')) return;
+  let key = getCurrentFormKey();
+  // Special resolution for CCTV / POI combined screen
+  if (!key && sopState.stepIdx === 4) {
+    const n = e.target.name || '';
+    if (n.startsWith('cctv_')) key = 'cctv';
+    else if (n.startsWith('poi_')) key = 'poi';
+  }
+  if (key) {
+    saveFormData(key);
+  }
+}
+
+function setupAutoSaveListeners() {
+  if (autoSaveInitialized) return;
+  autoSaveInitialized = true;
+  document.addEventListener('input', handleAutoSave, true);
+  document.addEventListener('change', handleAutoSave, true);
+}
+
+// === STEPPER RENDERING ===
+    
+    function renderStepper() {
+      const stepper = document.getElementById('progressStepper');
+      let html = '';
+      for (let i = 0; i < SOP_STEPS.length; i++) {
+        let cls = i < sopState.stepIdx ? 'stepper-step finished' :
+                  i === sopState.stepIdx ? 'stepper-step active' :
+                  'stepper-step';
+        html += `
+          <div class="${cls}">
+            <div class="circle">${i < sopState.stepIdx ? '<i class="bi bi-check-lg"></i>' : i+1}</div>
+            <div class="label">${SOP_STEPS[i].label}</div>
+          </div>
+        `;
+      }
+      stepper.innerHTML = html;
+    }
+    
+    // === FORM FIELD HELPERS ===
+    
+    function inputField(label, name, required=true, type="text", value="") {
+      const reqMark = required ? ' <span class="text-danger fw-bold">*</span>' : '';
+      return `<div class="mb-3">
+        <label class="form-label">${label}${reqMark}</label>
+        <input class="form-control" name="${name}" ${required ? "required" : ""} type="${type}" value="${value}" />
+      </div>`;
+    }
+    
+    function textAreaField(label, name, required=true, rows=3, value="") {
+      const reqMark = required ? ' <span class="text-danger fw-bold">*</span>' : '';
+      return `<div class="mb-3">
+        <label class="form-label">${label}${reqMark}</label>
+        <textarea class="form-control" name="${name}" ${required ? "required" : ""} rows="${rows}">${value}</textarea>
+      </div>`;
+    }
+    
+    function witnessField(idx=1) {
+      return `<div class="witness-container">
+        <span class="fw-bold mb-2 d-block"><i class="bi bi-person"></i> Witness #${idx}</span>
+        ${inputField('Witness Name', `witness_${idx}_name`, false)}
+        ${inputField('Witness Contact', `witness_${idx}_contact`, false)}
+        ${textAreaField('Statement', `witness_${idx}_statement`, false, 2)}
+      </div>`;
+    }
+    
+    function fileInputField(label, name, required=false) {
+      const reqMark = required ? ' <span class="text-danger fw-bold">*</span>' : '';
+      return `<div class="mb-3">
+        <label class="form-label">${label}${reqMark}</label>
+        <input class="form-control" name="${name}" type="file" accept="image/*" ${required?"required":""}/>
+        <small class="form-text text-muted">Accepted: Images only (JPG, PNG, GIF, WEBP)</small>
+      </div>`;
+    }
+    
+    // === FORM SECTION BUILDER ===
+    
+    function SectionCard(formName, contentHtml) {
+      const form = FORM_LIB[formName];
+      return `<div class="form-section ${form.color}">
+        <h5><i class="bi ${form.icon}"></i> ${form.title}</h5>
+        ${contentHtml}
+      </div>`;
+    }
+    
+    // === SPECIALIZED FORMS ===
+    
+    function IncidentReportForm() {
+      return SectionCard('incident', `
+        ${inputField('Dispatch log', 'dispatch_log', true)}
+        ${inputField('Attendant', 'attendant')}
+        <h6 class="mt-4 mb-3" style="color: var(--upei-maroon); font-weight: 600;">Information of Incident</h6>
+        ${inputField('Date of incident', 'date_of_incident', true, 'date')}
+        ${inputField('Time of incident', 'time_of_incident', true, 'time')}
+        ${inputField('Location of incident', 'location_of_incident')}
+        ${inputField('Complainant Name', 'complainant_name')}
+        ${inputField('Complainant DOB', 'complainant_dob', false, 'date')}
+        ${inputField('Complainant Address', 'complainant_address', false)}
+        ${inputField('Complainant Phone', 'complainant_phone', false, 'tel')}
+        ${inputField('Subject of Complaint Name', 'subject_of_complaint_name', false)}
+        ${inputField('Subject of Complaint DOB', 'subject_of_complaint_dob', false, 'date')}
+        ${inputField('Subject of Complaint Address', 'subject_of_complaint_address', false)}
+        ${inputField('Subject of Complaint Phone', 'subject_of_complaint_phone', false, 'tel')}
+        ${textAreaField('Details of Incident', 'details_of_incident')}
+        ${fileInputField('Upload Photo', 'incident_photo', false)}
+      `);
+    }
+    
+    function IntakeForm() {
+      return SectionCard('intake', `
+        <div class="mb-3">
+          <label class="form-label">Complainant full name and ID# <span class="text-danger fw-bold">*</span></label>
+          <input class="form-control" name="complainant_full_name_and_id" required />
+          <div class="mt-2">
+            <label class="form-label">Complainant Status:</label>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="complainant_status_employee" id="status_employee">
+              <label class="form-check-label" for="status_employee">Employee</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="complainant_status_student" id="status_student">
+              <label class="form-check-label" for="status_student">Student</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="complainant_status_visitor" id="status_visitor">
+              <label class="form-check-label" for="status_visitor">Visitor</label>
+            </div>
+          </div>
+        </div>
+        ${inputField('Complainant phone number', 'complainant_phone_number', false, 'tel')}
+        ${inputField('Complainant email address', 'complainant_email_address', false, 'email')}
+        ${inputField('Security Member incident reported to', 'security_member_reported_to')}
+        ${inputField('Date/Time incident occurred', 'datetime_incident_occurred', true, 'datetime-local')}
+        ${inputField('Date/Time reported', 'datetime_reported', true, 'datetime-local')}
+        ${inputField('Location incident occurred', 'location_incident_occurred')}
+        ${inputField('Accepted Referrals', 'accepted_referrals', false)}
+        ${textAreaField('Witnesses names/contact details', 'witnesses_names_contact_details', false, 3)}
+        ${inputField('Injuries', 'injuries', false)}
+        ${inputField('Treated by', 'treated_by', false)}
+        ${inputField('Supporting physical evidence', 'supporting_physical_evidence', false)}
+        <div class="mb-3">
+          <label class="form-label">Safety Plan Required</label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="safety_plan_required" id="safety_yes" value="Yes">
+              <label class="form-check-label" for="safety_yes">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="safety_plan_required" id="safety_no" value="No">
+              <label class="form-check-label" for="safety_no">No</label>
+            </div>
+          </div>
+        </div>
+        ${fileInputField('Upload Photo', 'intake_photo', false)}
+      `);
+    }
+    
+    function HSForm() {
+      return SectionCard('hs', `
+        <h6 class="mb-3" style="color: var(--upei-maroon); font-weight: 600;">Section A: Affected Party Information</h6>
+        <div class="mb-3">
+          <label class="form-label">Affected Party status <span class="text-danger fw-bold">*</span></label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="hs_status_employee" id="hs_employee">
+              <label class="form-check-label" for="hs_employee">Employee</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="hs_status_student" id="hs_student">
+              <label class="form-check-label" for="hs_student">Student</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="hs_status_visitor" id="hs_visitor">
+              <label class="form-check-label" for="hs_visitor">Visitor</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="hs_status_volunteer" id="hs_volunteer">
+              <label class="form-check-label" for="hs_volunteer">Volunteer</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="hs_status_contractor" id="hs_contractor">
+              <label class="form-check-label" for="hs_contractor">Contractor</label>
+            </div>
+          </div>
+        </div>
+        ${inputField('Initial', 'hs_initial', false)}
+        ${inputField('UPEI Job Title and Department at the Time of Incident', 'hs_job_title_department', false)}
+        <h6 class="mt-4 mb-3" style="color: var(--upei-maroon); font-weight: 600;">Section B: Incident Details</h6>
+        ${inputField('Date of incident', 'hs_date_of_incident', true, 'date')}
+        ${inputField('Time of incident', 'hs_time_of_incident', true, 'time')}
+        ${inputField('Location of incident', 'hs_location_of_incident')}
+        ${inputField('Date and time reported', 'hs_date_time_reported', true, 'datetime-local')}
+        <div class="mb-3">
+          <label class="form-label">Reported to supervisor <span class="text-danger fw-bold">*</span></label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="hs_reported_to_supervisor" id="hs_supervisor_yes" value="Yes" required>
+              <label class="form-check-label" for="hs_supervisor_yes">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="hs_reported_to_supervisor" id="hs_supervisor_no" value="No" required>
+              <label class="form-check-label" for="hs_supervisor_no">No</label>
+            </div>
+          </div>
+        </div>
+        ${textAreaField('Was this reported to any other UPEI Employees? (Yes/No, if yes who)', 'hs_reported_to_other_employees', false, 2)}
+        ${textAreaField('Are you aware of any witnesses to or persons involved in this incident? (Yes/No, if yes provide names/positions/telephone numbers)', 'hs_witnesses', false, 3)}
+        <div class="mb-3">
+          <label class="form-label">Was first aid administered?</label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="hs_first_aid_administered" id="hs_firstaid_yes" value="Yes">
+              <label class="form-check-label" for="hs_firstaid_yes">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="hs_first_aid_administered" id="hs_firstaid_no" value="No">
+              <label class="form-check-label" for="hs_firstaid_no">No</label>
+            </div>
+          </div>
+        </div>
+        ${textAreaField('If yes: by whom and what first aid was applied', 'hs_first_aid_details', false, 2)}
+        <div class="mb-3">
+          <label class="form-label">Was individual transported for medical aid?</label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="hs_transported_for_medical_aid" id="hs_transport_yes" value="Yes">
+              <label class="form-check-label" for="hs_transport_yes">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="hs_transported_for_medical_aid" id="hs_transport_no" value="No">
+              <label class="form-check-label" for="hs_transport_no">No</label>
+            </div>
+          </div>
+        </div>
+        ${textAreaField('If yes: by whom and to where', 'hs_transported_details', false, 2)}
+        ${textAreaField('If injury sustained: describe injury, include body parts affected, is this a recurrence?', 'hs_injury_description', false, 3)}
+        ${textAreaField('What conditions attributed to the incident?', 'hs_conditions_attributed', false, 3)}
+        ${textAreaField('Description of incident/What happened?', 'hs_incident_description')}
+        ${fileInputField('Upload Photo', 'hs_photo', false)}
+      `);
+    }
+    
+    function CriminalForm() {
+      return SectionCard('criminal', `
+        <div class="mb-3">
+          <label class="form-label">Referral Type</label>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="rcmpCheckbox" name="rcmp_selected" ${sopState.rcmpSelected ? 'checked' : ''}>
+            <label class="form-check-label" for="rcmpCheckbox">
+              RCMP
+            </label>
+          </div>
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" id="cpsCheckbox" name="cps_selected" ${sopState.cpsSelected ? 'checked' : ''}>
+            <label class="form-check-label" for="cpsCheckbox">
+              CPS
+            </label>
+          </div>
+        </div>
+        ${inputField('Date of Referral', 'criminal_date_of_referral', false, 'date')}
+        ${inputField('Location', 'criminal_location', false)}
+        ${inputField('Investigating Officer', 'criminal_investigating_officer', false)}
+        ${textAreaField('Incident / Criminal Details', 'criminal_incident_details', false)}
+        ${fileInputField('Upload Photo', 'criminal_photo', false)}
+      `);
+    }
+    
+    function CCTVForm() {
+      return SectionCard('cctv', `
+        ${inputField('Department', 'cctv_department')}
+        ${inputField('Request Date', 'cctv_request_date', true, 'date')}
+        <div class="mb-3">
+          <label class="form-label">Requested by Police Services</label>
+          <div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="cctv_requested_by_cps" id="cctvRequestedByCps">
+              <label class="form-check-label" for="cctvRequestedByCps">
+                <i class="bi bi-shield-fill"></i> CPS
+              </label>
+            </div>
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="checkbox" name="cctv_requested_by_rcmp" id="cctvRequestedByRcmp">
+              <label class="form-check-label" for="cctvRequestedByRcmp">
+                <i class="bi bi-shield-fill"></i> RCMP
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Requestor Type</label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="cctv_faculty" id="cctv_faculty">
+              <label class="form-check-label" for="cctv_faculty">Faculty</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="cctv_staff" id="cctv_staff">
+              <label class="form-check-label" for="cctv_staff">Staff</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="cctv_student" id="cctv_student">
+              <label class="form-check-label" for="cctv_student">Student</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="cctv_atip" id="cctv_atip">
+              <label class="form-check-label" for="cctv_atip">ATIP</label>
+            </div>
+          </div>
+        </div>
+        ${inputField('Start Date/Time', 'cctv_start_datetime', true, 'datetime-local')}
+        ${inputField('Finish Date/Time', 'cctv_finish_datetime', true, 'datetime-local')}
+        <h6 class="mb-3" style="color: var(--upei-maroon); font-weight: 600;">Requestor (Please Print):</h6>
+        ${inputField('Last Name', 'cctv_requestor_last_name')}
+        ${inputField('First Name', 'cctv_requestor_first_name')}
+        ${inputField('Initial', 'cctv_requestor_initial', false)}
+        ${inputField('Employee Number', 'cctv_employee_number', false)}
+        ${inputField('Building', 'cctv_building')}
+        ${inputField('Room Number', 'cctv_room_number', false)}
+        ${inputField('Supervisor', 'cctv_supervisor', false)}
+        ${inputField('Office Phone', 'cctv_office_phone', false, 'tel')}
+        ${textAreaField('CCTV camera review requested', 'cctv_camera_review_requested')}
+      `);
+    }
+    
+    function POIForm() {
+      return SectionCard('poi', `
+        ${inputField('Incident Date', 'poi_incident_date', false, 'date')}
+        ${inputField('Incident Type', 'poi_incident_type', false)}
+        ${inputField('Occurrence #', 'poi_occurrence_number', false)}
+        ${inputField('Police File #', 'poi_police_file_number', false)}
+        ${inputField('Investigating Attendant', 'poi_investigating_attendant', false)}
+        ${inputField('Last Name', 'poi_last_name', false)}
+        ${inputField('Middle Name', 'poi_middle_name', false)}
+        ${inputField('First Name', 'poi_first_name', false)}
+        ${inputField('DOB', 'poi_dob', false, 'date')}
+        <h6 class="mb-3" style="color: var(--upei-maroon); font-weight: 600;">Address</h6>
+        ${inputField('Street', 'poi_street', false)}
+        ${inputField('City/Town', 'poi_city_town', false)}
+        ${inputField('Postal Code', 'poi_postal_code', false)}
+        ${textAreaField('Description of incident', 'poi_description_of_incident', false, 3)}
+        <h6 class="mb-3" style="color: var(--upei-maroon); font-weight: 600;">Previous Incidents</h6>
+        ${inputField('Previous Incident Date', 'poi_previous_incident_date', false, 'date')}
+        ${inputField('Previous Occurrence', 'poi_previous_occurrence', false)}
+        ${fileInputField('Upload Photo', 'poi_photo', false)}
+        <small class="form-text text-muted">Complete this section only if a person of interest was identified.</small>
+      `);
+    }
+    
+    // === NAVIGATION FUNCTIONS ===
+    
+    function nextStep() {
+      // Persist data of the current form before navigating forward
+      const key = getCurrentFormKey();
+      if (key) {
+        saveFormData(key);
+      }
+      sopState.stepIdx++;
+      renderStage();
+    }
+    
+    function prevStep() {
+      // Persist data of the current form before navigating backward
+      const key = getCurrentFormKey();
+      if (key) {
+        saveFormData(key);
+      }
+      sopState.stepIdx--;
+      renderStage();
+    }
+    
+    // === STAGE RENDERING ===
+    
+    function renderStage() {
+      renderStepper();
+      const f = document.getElementById('incidentForm');
+      f.innerHTML = '';
+      
+      // Step 1: Initial Routing
+      if (sopState.stepIdx === 0) {
+        f.innerHTML = `
+          <div class="form-section section-grey">
+            <h5 class="mb-4"><i class="bi bi-signpost-split"></i> Step 1: Initial Routing</h5>
+            <p class="mb-3">Please select how the incident was received:</p>
+            <div class="d-grid gap-3 d-md-flex">
+              <button type="button" class="btn btn-outline-primary btn-lg flex-fill"
+                onclick="setRouting('dispatch')">
+                <i class="bi bi-broadcast"></i><br>
+                Dispatched
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-lg flex-fill"
+                onclick="setRouting('complainant')">
+                <i class="bi bi-person-raised-hand"></i><br>
+                Received by Complainant
+              </button>
+            </div>
+          </div>
+        `;
+      }
+      // Step 2: Incident Details
+      else if (sopState.stepIdx === 1) {
+        let info = sopState.routing==='dispatch'
+          ? "Please complete the Incident Report form below."
+          : "Please complete the Intake Form below.";
+        let formHtml = sopState.routing==='dispatch'
+          ? IncidentReportForm()
+          : IntakeForm();
+        
+        f.innerHTML = `
+          <div class="form-section section-grey">
+            <h5 class="mb-3"><i class="bi bi-clipboard-data"></i> Step 2: Incident Details</h5>
+            <p class="mb-3">${info}</p>
+          </div>
+          ${formHtml}
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-secondary" onclick="prevStep()">
+              <i class="bi bi-arrow-left"></i> Back
+            </button>
+            <button type="submit" class="btn btn-primary ms-auto">
+              Next <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        `;
+        
+        f.onsubmit = function(evt) {
+          evt.preventDefault();
+          if (!f.checkValidity()) {
+            f.reportValidity();
+            return;
+          }
+          // Validate dispatch log for dispatched incidents
+          if (sopState.routing === 'dispatch') {
+            const dispatchLogField = document.querySelector('[name="dispatch_log"]');
+            if (!dispatchLogField || !dispatchLogField.value || dispatchLogField.value.trim() === '') {
+              alert('Error: Dispatch Log number is required.');
+              if (dispatchLogField) dispatchLogField.focus();
+              return;
+            }
+          }
+          // Final save before moving forward
+          const k = sopState.routing==='dispatch' ? 'incident' : 'intake';
+          saveFormData(k);
+          
+          // Generate report ID with dispatch log if this is a dispatched incident
+          if (sopState.routing === 'dispatch' && !sopState.reportId) {
+            try {
+              const dispatchLog = sopState.forms['incident']?.dispatch_log;
+              sopState.reportId = generateReportId(dispatchLog);
+            } catch (error) {
+              alert(error.message);
+              return;
+            }
+          }
+          
+          nextStep();
+        };
+        
+        focusFirstInput();
+      // Attempt to restore saved data for the current step
+      try {
+        const restoreKey = getCurrentFormKey();
+        if (restoreKey) {
+          setTimeout(() => {
+            restoreFormData(restoreKey);
+            setupFileInputListeners();
+          }, 50);
+        }
+      } catch(err) { console.warn('Restore error', err); }
+      }
+      // Step 3: Type Selection
+      else if (sopState.stepIdx === 2) {
+        f.innerHTML = `
+          <div class="form-section section-grey">
+            <h5 class="mb-4"><i class="bi bi-tags"></i> Step 3: Categorize Incident</h5>
+            <p class="mb-3">Is this matter related to Health & Safety or Criminal activity?</p>
+            <div class="d-grid gap-3 d-md-flex">
+              <button type="button" class="btn btn-success btn-lg flex-fill"
+                onclick="setHsCriminal('hs')">
+                <i class="bi bi-heart-pulse-fill"></i><br>
+                Health & Safety
+              </button>
+              <button type="button" class="btn btn-primary btn-lg flex-fill"
+                onclick="setHsCriminal('criminal')">
+                <i class="bi bi-shield-lock-fill"></i><br>
+                Criminal/RCMP/CPS Referral
+              </button>
+            </div>
+            <div class="mt-3">
+              <button type="button" class="btn btn-secondary"
+                onclick="prevStep()">
+                <i class="bi bi-arrow-left"></i> Back
+              </button>
+            </div>
+          </div>
+        `;
+      }
+      // Step 4: Specialized Forms
+      else if (sopState.stepIdx === 3) {
+        if (sopState.hsOrCriminal === 'hs') {
+          f.innerHTML = `
+            <div class="form-section section-grey">
+              <h5 class="mb-3"><i class="bi bi-file-text"></i> Step 4: Specialized Forms</h5>
+              <p class="mb-3">Complete the Health & Safety Report below.</p>
+            </div>
+            ${HSForm()}
+            <div class="form-section section-green cctv-poi-checkboxes">
+              <h5 class="mb-3"><i class="bi bi-clipboard-check"></i> Additional Information</h5>
+              <p class="mb-3">Please indicate if CCTV or Person of Interest (POI) information is available:</p>
+              
+              <div class="form-check mt-3">
+                <input class="form-check-input" type="checkbox" id="cctvCheckbox" name="cctv_available" ${sopState.cctvAvailable ? 'checked' : ''}>
+                <label class="form-check-label fw-bold" for="cctvCheckbox">
+                  <i class="bi bi-camera-video"></i> CCTV Requested
+                </label>
+              </div>
+              
+              <div class="form-check mt-3">
+                <input class="form-check-input" type="checkbox" id="poiCheckbox" name="poi_available" ${sopState.poiAvailable ? 'checked' : ''}>
+                <label class="form-check-label fw-bold" for="poiCheckbox">
+                  <i class="bi bi-person-badge"></i> POI Available
+                </label>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                <i class="bi bi-arrow-left"></i> Back
+              </button>
+              <button type="submit" class="btn btn-primary ms-auto">
+                Next <i class="bi bi-arrow-right"></i>
+              </button>
+            </div>
+          `;
+          
+          f.onsubmit = function(evt) {
+            evt.preventDefault();
+            if (!f.checkValidity()) {
+              f.reportValidity();
+              return;
+            }
+            // Get checkbox states
+            const cctvCheckbox = document.getElementById('cctvCheckbox');
+            const poiCheckbox = document.getElementById('poiCheckbox');
+            if (cctvCheckbox) sopState.cctvAvailable = cctvCheckbox.checked;
+            if (poiCheckbox) sopState.poiAvailable = poiCheckbox.checked;
+            
+            // Final save before moving forward
+            saveFormData('hs');
+            nextStep();
+          };
+          
+          // Restore saved data and setup listeners
+          setTimeout(() => {
+            restoreFormData('hs');
+            setupCheckboxListeners();
+            setupFileInputListeners();
+          }, 50);
+        } else if (sopState.hsOrCriminal === 'criminal') {
+          f.innerHTML = `
+            <div class="form-section section-grey">
+              <h5 class="mb-3"><i class="bi bi-file-text"></i> Step 4: Specialized Forms</h5>
+              <p class="mb-3">Complete the Criminal / CPS Referral form below.</p>
+            </div>
+            ${CriminalForm()}
+            <div class="form-section section-blue cctv-poi-checkboxes">
+              <h5 class="mb-3"><i class="bi bi-clipboard-check"></i> Additional Information</h5>
+              <p class="mb-3">Please indicate if CCTV or Person of Interest (POI) information is available:</p>
+              
+              <div class="form-check mt-3">
+                <input class="form-check-input" type="checkbox" id="cctvCheckbox" name="cctv_available" ${sopState.cctvAvailable ? 'checked' : ''}>
+                <label class="form-check-label fw-bold" for="cctvCheckbox">
+                  <i class="bi bi-camera-video"></i> CCTV Requested
+                </label>
+              </div>
+              
+              <div class="form-check mt-3">
+                <input class="form-check-input" type="checkbox" id="poiCheckbox" name="poi_available" ${sopState.poiAvailable ? 'checked' : ''}>
+                <label class="form-check-label fw-bold" for="poiCheckbox">
+                  <i class="bi bi-person-badge"></i> POI Available
+                </label>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                <i class="bi bi-arrow-left"></i> Back
+              </button>
+              <button type="submit" class="btn btn-primary ms-auto">
+                Next <i class="bi bi-arrow-right"></i>
+              </button>
+            </div>
+          `;
+          
+          f.onsubmit = function(evt) {
+            evt.preventDefault();
+            if (!f.checkValidity()) {
+              f.reportValidity();
+              return;
+            }
+            // Get checkbox states
+            const cctvCheckbox = document.getElementById('cctvCheckbox');
+            const poiCheckbox = document.getElementById('poiCheckbox');
+            const rcmpCheckbox = document.getElementById('rcmpCheckbox');
+            const cpsCheckbox = document.getElementById('cpsCheckbox');
+            if (cctvCheckbox) sopState.cctvAvailable = cctvCheckbox.checked;
+            if (poiCheckbox) sopState.poiAvailable = poiCheckbox.checked;
+            if (rcmpCheckbox) sopState.rcmpSelected = rcmpCheckbox.checked;
+            if (cpsCheckbox) sopState.cpsSelected = cpsCheckbox.checked;
+            
+            // Final save before moving forward
+            saveFormData('criminal');
+            nextStep();
+          };
+          
+          // Restore saved data and setup listeners
+          setTimeout(() => {
+            restoreFormData('criminal');
+            setupCheckboxListeners();
+            setupFileInputListeners();
+          }, 50);
+        }
+        
+        // Restore saved data for CCTV/POI forms
+        setTimeout(() => {
+          if (sopState.cctvAvailable) restoreFormData('cctv');
+          if (sopState.poiAvailable) restoreFormData('poi');
+          setupFileInputListeners();
+        }, 50);
+        
+        focusFirstInput();
+      // Attempt to restore saved data for the current step
+      try {
+        const restoreKey = getCurrentFormKey();
+        if (restoreKey) {
+          setTimeout(() => {
+            restoreFormData(restoreKey);
+            setupFileInputListeners();
+          }, 50);
+        }
+      } catch(err) { console.warn('Restore error', err); }
+      }
+      // Step 5: CCTV/POI
+      else if (sopState.stepIdx === 4) {
+        // Check if both are false - skip directly to summary
+        if (sopState.cctvAvailable === false && sopState.poiAvailable === false) {
+          // No CCTV or POI, skip to summary
+          nextStep();
+          return;
+        }
+        
+        let cctvSection = '';
+        let poiSection = '';
+        let headerMessage = '';
+        
+        if (sopState.cctvAvailable && sopState.poiAvailable) {
+          headerMessage = 'Complete the CCTV Request form and POI form below.';
+          cctvSection = CCTVForm();
+          poiSection = POIForm();
+        } else if (sopState.cctvAvailable && !sopState.poiAvailable) {
+          headerMessage = 'Complete the CCTV Request form below.';
+          cctvSection = CCTVForm();
+        } else if (!sopState.cctvAvailable && sopState.poiAvailable) {
+          headerMessage = 'Complete the Person of Interest (POI) form below.';
+          poiSection = POIForm();
+        }
+        
+        f.innerHTML = `
+          <div class="form-section section-grey">
+            <h5 class="mb-3"><i class="bi bi-card-checklist"></i> Step 5: CCTV & Person of Interest</h5>
+            <p class="mb-3">${headerMessage}</p>
+          </div>
+          ${cctvSection}
+          ${poiSection}
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-secondary" onclick="prevStep()">
+              <i class="bi bi-arrow-left"></i> Back
+            </button>
+            <button type="button" class="btn btn-primary ms-auto" onclick="finalizeStep5()">
+              Finish <i class="bi bi-check-lg"></i>
+            </button>
+          </div>
+        `;
+        
+        // Restore data for Step 5 forms (CCTV and/or POI)
+        setTimeout(() => {
+          if (sopState.cctvAvailable) restoreFormData('cctv');
+          if (sopState.poiAvailable) restoreFormData('poi');
+          setupFileInputListeners();
+        }, 50);
+        
+        focusFirstInput();
+      // Attempt to restore saved data for the current step
+      try {
+        const restoreKey = getCurrentFormKey();
+        if (restoreKey) {
+          setTimeout(() => {
+            restoreFormData(restoreKey);
+            setupFileInputListeners();
+          }, 50);
+        }
+      } catch(err) { console.warn('Restore error', err); }
+      }
+      // Step 6: Summary & Export
+      else if (sopState.stepIdx === 5) {
+        const formsDone = Object.keys(sopState.forms);
+        
+        // Individual form export buttons
+        const individualForms = formsDone.map(formKey =>
+          `<div class="card mb-3">
+            <div class="card-body">
+              <h6 class="card-title mb-3">
+                <i class="bi ${FORM_LIB[formKey].icon}"></i> ${FORM_LIB[formKey].title}
+              </h6>
+              <button class="btn btn-success me-2 mb-2" onclick="exportFormPDF('${formKey}')">
+                <i class="bi bi-file-earmark-pdf"></i> Export as PDF
+              </button>
+              <button class="btn btn-outline-primary mb-2" onclick="printSingleForm('${formKey}')">
+                <i class="bi bi-printer"></i> Print Form
+              </button>
+            </div>
+          </div>`
+        ).join('');
+        
+        // Generate printable forms HTML (hidden on screen, visible in print)
+        const printableForms = formsDone.map(formKey => {
+          const formData = sopState.forms[formKey];
+          const formInfo = FORM_LIB[formKey];
+          let formHtml = `<div class="printable-form print-only" data-form="${formKey}">
+            <h3 style="color: #8B0000; border-bottom: 2px solid #D4AF37; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+              ${formInfo.title}
+            </h3>`;
+          
+          for (let key in formData) {
+            if (typeof formData[key] === 'object') continue;
+            let label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            formHtml += `<div class="form-data-display">
+              <strong>${label}:</strong><br>
+              <span>${formData[key] || 'N/A'}</span>
+            </div>`;
+          }
+          
+          formHtml += '</div>';
+          return formHtml;
+        }).join('');
+        
+        f.innerHTML = `
+          <div class="form-section section-green no-print">
+            <h4 class="mb-3"><i class="bi bi-check-circle-fill"></i> Submission Complete</h4>
+            <div class="alert alert-success">
+              <i class="bi bi-check2-circle"></i> Your incident report has been saved successfully.
+            </div>
+            <p class="mb-3"><strong>Report ID:</strong> <span class="report-id">${sopState.reportId}</span></p>
+            
+            <h5 class="mb-3 mt-4"><i class="bi bi-file-earmark-text"></i> Individual Forms</h5>
+            <p class="mb-3">Export or print each form separately:</p>
+            ${individualForms}
+            
+            <h5 class="mb-3 mt-4"><i class="bi bi-files"></i> Bulk Operations</h5>
+            <p class="mb-3">Export or print all forms together:</p>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <button class="btn btn-success w-100" onclick="exportAllFormsPDF()">
+                  <i class="bi bi-file-earmark-pdf"></i> Export All Forms as PDF
+                </button>
+              </div>
+              <div class="col-md-6 mb-3">
+                <button class="btn btn-outline-primary w-100" onclick="printAllForms()">
+                  <i class="bi bi-printer"></i> Print All Forms
+                </button>
+              </div>
+              <div class="col-md-6 mb-3">
+                <button class="btn btn-outline-success w-100" onclick="exportAsJSON()">
+                  <i class="bi bi-filetype-json"></i> Download All as JSON
+                </button>
+              </div>
+              <div class="col-md-6 mb-3">
+                <button class="btn btn-outline-info w-100" onclick="exportAsCSV()">
+                  <i class="bi bi-filetype-csv"></i> Download All as CSV
+                </button>
+              </div>
+            </div>
+            
+            <div class="mt-4">
+              <button class="btn btn-primary" onclick="startNew()">
+                <i class="bi bi-plus-circle"></i> Start New Report
+              </button>
+              <button class="btn btn-secondary ms-2" onclick="prevStep()">
+                <i class="bi bi-arrow-left"></i> Back
+              </button>
+            </div>
+          </div>
+          
+          <!-- Printable Forms (hidden on screen, shown when printing) -->
+          <div id="printableForms">
+            ${printableForms}
+          </div>
+        `;
+        
+        // Save to admin store
+        saveReportToAdminStore();
+      }
+    }
+    
+    // === ROUTING & SELECTION FUNCTIONS ===
+    
+    function setRouting(val) {
+      sopState.routing = val;
+      sopState.incidentType = (val === 'dispatch' ? 'incident' : 'intake');
+      // Report ID will be generated after dispatch log is entered
+      sopState.reportId = null;
+      nextStep();
+      showToast(`Routing selected: ${val === 'dispatch' ? 'Dispatched' : 'Received by Complainant'}`, 'info');
+    }
+    
+    function setHsCriminal(val) {
+      sopState.hsOrCriminal = val;
+      sopState.cctvAvailable = null;
+      sopState.poiAvailable = null;
+      nextStep();
+      showToast(`Category selected: ${val === 'hs' ? 'Health & Safety' : 'Criminal'}`, 'info');
+    }
+    
+    function clearFormFields() {
+      const form = document.getElementById('incidentForm');
+      if (!form) return;
+      
+      // Clear all input fields (except checkboxes)
+      form.querySelectorAll('input[type="text"]').forEach(el => el.value = '');
+      form.querySelectorAll('input[type="date"]').forEach(el => el.value = '');
+      form.querySelectorAll('input[type="time"]').forEach(el => el.value = '');
+      form.querySelectorAll('input[type="datetime-local"]').forEach(el => el.value = '');
+      form.querySelectorAll('input[type="email"]').forEach(el => el.value = '');
+      form.querySelectorAll('input[type="tel"]').forEach(el => el.value = '');
+      
+      // Clear textareas
+      form.querySelectorAll('textarea').forEach(el => el.value = '');
+      
+      // Clear file inputs
+      form.querySelectorAll('input[type="file"]').forEach(el => el.value = '');
+      
+      // Clear selects
+      form.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+      
+      // Clear radio buttons and other checkboxes (except CCTV/POI checkboxes)
+      form.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
+      form.querySelectorAll('input[type="checkbox"]:not(#cctvCheckbox):not(#poiCheckbox)').forEach(el => el.checked = false);
+      
+      showToast('Form fields cleared', 'info');
+    }
+    
+    function setupCheckboxListeners() {
+      const cctvCheckbox = document.getElementById('cctvCheckbox');
+      const poiCheckbox = document.getElementById('poiCheckbox');
+      const rcmpCheckbox = document.getElementById('rcmpCheckbox');
+      const cpsCheckbox = document.getElementById('cpsCheckbox');
+      
+      if (cctvCheckbox) {
+        cctvCheckbox.addEventListener('change', function() {
+          sopState.cctvAvailable = this.checked;
+          // NO field clearing - just update state
+        });
+      }
+      
+      if (poiCheckbox) {
+        poiCheckbox.addEventListener('change', function() {
+          sopState.poiAvailable = this.checked;
+          // NO field clearing - just update state
+        });
+      }
+      
+      if (rcmpCheckbox) {
+        rcmpCheckbox.addEventListener('change', function() {
+          sopState.rcmpSelected = this.checked;
+          // NO field clearing - just update state
+        });
+      }
+      
+      if (cpsCheckbox) {
+        cpsCheckbox.addEventListener('change', function() {
+          sopState.cpsSelected = this.checked;
+          // NO field clearing - just update state
+        });
+      }
+    }
+    
+    function finalizeStep5() {
+      // Save CCTV and POI forms based on availability selections before finishing
+      if (sopState.cctvAvailable === true) {
+        saveFormData('cctv');
+      }
+      if (sopState.poiAvailable === true) {
+        saveFormData('poi');
+      }
+      
+      // Generate report ID if not already generated (for intake forms)
+      if (sopState.routing === 'complainant' && !sopState.reportId) {
+        const date = new Date();
+        const dateStr = date.toISOString().split('T')[0];
+        const random = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+        sopState.reportId = `UPEI-${dateStr}-${random}`;
+      }
+      
+      nextStep();
+    }
+    
+    // === DATA MANAGEMENT ===
+    
+    function saveFormData(formKey) {
+      const f = document.getElementById('incidentForm');
+      if (!f) return;
+      
+      // Get existing saved data or create new object
+      const data = sopState.forms[formKey] || {};
+      
+      // Save all input text, date, time, email, tel
+      f.querySelectorAll('input[type="text"], input[type="date"], input[type="time"], input[type="datetime-local"], input[type="email"], input[type="tel"]').forEach(el => {
+        if (el.name) data[el.name] = el.value;
+      });
+      
+      // Save textareas
+      f.querySelectorAll('textarea').forEach(el => {
+        if (el.name) data[el.name] = el.value;
+      });
+      
+      // Save selects
+      f.querySelectorAll('select').forEach(el => {
+        if (el.name) data[el.name] = el.value;
+      });
+      
+      // Save checkboxes (store true/false)
+      f.querySelectorAll('input[type="checkbox"]').forEach(el => {
+        if (el.name) data[el.name] = el.checked;
+      });
+      
+      // Save radio buttons (only checked ones)
+      f.querySelectorAll('input[type="radio"]:checked').forEach(el => {
+        if (el.name) data[el.name] = el.value;
+      });
+      
+      // Store file data as base64 for restoration
+      if (!data._files) data._files = {};
+      const fileInputs = f.querySelectorAll('input[type="file"]');
+      fileInputs.forEach(input => {
+        if (input.files && input.files[0]) {
+          const file = input.files[0];
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            data._files[input.name] = {
+              name: file.name,
+              type: file.type,
+              data: e.target.result
+            };
+            data[input.name] = `[File: ${file.name}]`;
+            // Update the state with the file data
+            sopState.forms[formKey] = data;
+          };
+          reader.readAsDataURL(file);
+        } else if (data._files[input.name]) {
+          // Preserve existing file if no new file selected
+          // Do nothing - file is already saved
+        }
+      });
+      
+      sopState.forms[formKey] = data;
+    }
+    
+    function restoreFormData(formKey) {
+      if (!sopState.forms[formKey]) return;
+      
+      const savedData = sopState.forms[formKey];
+      const form = document.getElementById('incidentForm');
+      if (!form) return;
+      
+      // Restore text inputs, textareas, selects
+      for (let key in savedData) {
+        if (key === '_files') continue; // Skip file storage object
+        
+        const field = form.querySelector(`[name="${key}"]`);
+        if (field) {
+          if (field.type === 'checkbox') {
+            // Restore checkbox state (checked/unchecked)
+            field.checked = (savedData[key] === 'on' || savedData[key] === true || savedData[key] === 'true');
+          } else if (field.type === 'radio') {
+            // Restore radio button by value match
+            if (savedData[key] === field.value) {
+              field.checked = true;
+            }
+          } else if (field.type !== 'file') {
+            // Restore text, date, time, textarea, select values
+            field.value = savedData[key];
+          }
+        }
+      }
+      
+      // Restore file previews
+      if (savedData._files) {
+        for (let fieldName in savedData._files) {
+          const fileData = savedData._files[fieldName];
+          const fileInput = form.querySelector(`[name="${fieldName}"]`);
+          if (fileInput) {
+            displayFilePreview(fileInput, fileData);
+          }
+        }
+      }
+    }
+    
+    function displayFilePreview(fileInput, fileData) {
+      const previewId = fileInput.id + 'Preview';
+      let previewContainer = document.getElementById(previewId);
+      
+      if (!previewContainer) {
+        previewContainer = document.createElement('div');
+        previewContainer.id = previewId;
+        previewContainer.className = 'file-preview-container';
+        fileInput.parentElement.appendChild(previewContainer);
+      }
+      
+      previewContainer.innerHTML = `
+        <div class="file-preview-item">
+          <img src="${fileData.data}" class="file-preview-img" alt="Preview">
+          <div class="file-preview-info">
+            <strong>${fileData.name}</strong><br>
+            <small class="text-muted">File attached</small>
+          </div>
+          <button type="button" class="btn-remove-file" onclick="removeUploadedFile('${fileInput.name}')">
+            <i class="bi bi-trash"></i> Remove
+          </button>
+        </div>
+      `;
+    }
+    
+    function removeUploadedFile(fieldName) {
+      const fileInput = document.querySelector(`[name="${fieldName}"]`);
+      if (fileInput) {
+        fileInput.value = '';
+        const previewId = fileInput.id + 'Preview';
+        const previewContainer = document.getElementById(previewId);
+        if (previewContainer) {
+          previewContainer.remove();
+        }
+        
+        // Remove from saved form data
+        for (let formKey in sopState.forms) {
+          if (sopState.forms[formKey]._files && sopState.forms[formKey]._files[fieldName]) {
+            delete sopState.forms[formKey]._files[fieldName];
+            delete sopState.forms[formKey][fieldName];
+          }
+        }
+        
+        showToast('File removed', 'info');
+      }
+    }
+    
+    function setupFileInputListeners() {
+      const fileInputs = document.querySelectorAll('input[type="file"]');
+      fileInputs.forEach(input => {
+        input.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+              displayFilePreview(input, {
+                name: file.name,
+                type: file.type,
+                data: event.target.result
+              });
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      });
+    }
+    
+    function saveReportToAdminStore() {
+      // Validate dispatch log for incident reports
+      if (sopState.routing === 'dispatch' && !validateDispatchLog()) {
+        alert('Cannot save report: Dispatch Log number is missing.');
+        return;
+      }
+      
+      // Generate report ID if not already generated
+      if (sopState.routing === 'dispatch' && !sopState.reportId) {
+        try {
+          const dispatchLog = sopState.forms['incident']?.dispatch_log;
+          sopState.reportId = generateReportId(dispatchLog);
+        } catch (error) {
+          alert(error.message);
+          return;
+        }
+      }
+      
+      const copy = JSON.parse(JSON.stringify(sopState));
+      copy.timeSaved = new Date().toISOString();
+      incidentReports.push(copy);
+      showToast('Report saved successfully!', 'success');
+    }
+    
+    // === PRINT FUNCTIONS ===
+    
+    function printSingleForm(formKey) {
+      // Validate dispatch log for incident reports
+      if (sopState.routing === 'dispatch' && !validateDispatchLog()) {
+        return;
+      }
+      
+      // Generate report ID if not already generated
+      if (sopState.routing === 'dispatch' && !sopState.reportId) {
+        try {
+          const dispatchLog = sopState.forms['incident']?.dispatch_log;
+          sopState.reportId = generateReportId(dispatchLog);
+        } catch (error) {
+          alert(error.message);
+          return;
+        }
+      }
+      
+      // Hide all forms except the one to print
+      const allForms = document.querySelectorAll('.printable-form');
+      allForms.forEach(form => {
+        if (form.dataset.form === formKey) {
+          form.style.display = 'block';
+        } else {
+          form.style.display = 'none';
+        }
+      });
+      
+      // Update print header
+      const printHeader = document.querySelector('.print-header h1');
+      if (printHeader) {
+        printHeader.textContent = `UPEI Security Services - ${FORM_LIB[formKey].title}`;
+      }
+      
+      window.print();
+      
+      // Restore all forms visibility
+      setTimeout(() => {
+        allForms.forEach(form => {
+          form.style.display = 'block';
+        });
+      }, 500);
+    }
+    
+    function printAllForms() {
+      // Validate dispatch log for incident reports
+      if (sopState.routing === 'dispatch' && !validateDispatchLog()) {
+        return;
+      }
+      
+      // Generate report ID if not already generated
+      if (sopState.routing === 'dispatch' && !sopState.reportId) {
+        try {
+          const dispatchLog = sopState.forms['incident']?.dispatch_log;
+          sopState.reportId = generateReportId(dispatchLog);
+        } catch (error) {
+          alert(error.message);
+          return;
+        }
+      }
+      
+      // Show all forms
+      const allForms = document.querySelectorAll('.printable-form');
+      allForms.forEach(form => {
+        form.style.display = 'block';
+      });
+      
+      // Update print header
+      const printHeader = document.querySelector('.print-header h1');
+      if (printHeader) {
+        printHeader.textContent = 'UPEI Security Services - Complete Incident Report';
+      }
+      
+      window.print();
+    }
+    
+    // === ORIGINAL FORM TEMPLATE HTML GENERATION ===
+    
+    function generateOriginalFormHTML(formKey, formData) {
+      let html = '';
+      
+      if (formKey === 'incident') {
+        html = `
+          <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; background: white;">
+            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #8B0000; padding-bottom: 20px;">
+              <div style="font-size: 11px; color: #666; letter-spacing: 2px; margin-bottom: 8px;">UNIVERSITY OF PRINCE EDWARD ISLAND</div>
+              <div style="font-size: 16px; color: #8B0000; font-weight: bold; margin-bottom: 8px;">DEPARTMENT OF SECURITY SERVICES</div>
+              <div style="font-size: 18px; color: #8B0000; font-weight: bold;">~ INCIDENT REPORT ~</div>
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="width: 50%; padding: 8px; vertical-align: top;">
+                  <div style="margin-bottom: 5px;"><strong>Nature of Incident:</strong></div>
+                  <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.details_of_incident ? formData.details_of_incident.substring(0, 50) : 'N/A'}</div>
+                </td>
+                <td style="width: 50%; padding: 8px; vertical-align: top;">
+                  <div style="margin-bottom: 5px;"><strong>Date:</strong></div>
+                  <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.date_of_incident || 'N/A'}</div>
+                </td>
+              </tr>
+            </table>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 8px; vertical-align: top;">
+                  <div style="margin-bottom: 5px;"><strong>Dispatch log:</strong></div>
+                  <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.dispatch_log || 'N/A'}</div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; vertical-align: top;">
+                  <div style="margin-bottom: 5px;"><strong>Attendant:</strong></div>
+                  <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.attendant || 'N/A'}</div>
+                </td>
+              </tr>
+            </table>
+            
+            <div style="margin-top: 25px;">
+              <h4 style="text-decoration: underline; color: #8B0000; margin-bottom: 15px;">INFORMATION OF INCIDENT</h4>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="width: 33%; padding: 8px; vertical-align: top;">
+                    <div style="margin-bottom: 5px;"><strong>Date:</strong></div>
+                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.date_of_incident || 'N/A'}</div>
+                  </td>
+                  <td style="width: 33%; padding: 8px; vertical-align: top;">
+                    <div style="margin-bottom: 5px;"><strong>Time:</strong></div>
+                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.time_of_incident || 'N/A'}</div>
+                  </td>
+                  <td style="width: 34%; padding: 8px; vertical-align: top;">
+                    <div style="margin-bottom: 5px;"><strong>Location:</strong></div>
+                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.location_of_incident || 'N/A'}</div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            
+            <div style="margin-top: 25px;">
+              <h4 style="text-decoration: underline; color: #8B0000; margin-bottom: 15px;">COMPLAINANT</h4>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="width: 50%; padding: 8px; vertical-align: top;">
+                    <div style="margin-bottom: 5px;"><strong>Name:</strong></div>
+                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.complainant_name || 'N/A'}</div>
+                  </td>
+                  <td style="width: 50%; padding: 8px; vertical-align: top;">
+                    <div style="margin-bottom: 5px;"><strong>DOB:</strong></div>
+                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.complainant_dob || 'N/A'}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; vertical-align: top;">
+                    <div style="margin-bottom: 5px;"><strong>Address:</strong></div>
+                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.complainant_address || 'N/A'}</div>
+                  </td>
+                  <td style="padding: 8px; vertical-align: top;">
+                    <div style="margin-bottom: 5px;"><strong>Phone:</strong></div>
+                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.complainant_phone || 'N/A'}</div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            
+            <div style="margin-top: 25px;">
+              <h4 style="text-decoration: underline; color: #8B0000; margin-bottom: 15px;">SUBJECT OF COMPLAINT</h4>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="width: 50%; padding: 8px; vertical-align: top;">
+                    <div style="margin-bottom: 5px;"><strong>Name:</strong></div>
+                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.subject_of_complaint_name || 'N/A'}</div>
+                  </td>
+                  <td style="width: 50%; padding: 8px; vertical-align: top;">
+                    <div style="margin-bottom: 5px;"><strong>DOB:</strong></div>
+                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.subject_of_complaint_dob || 'N/A'}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; vertical-align: top;">
+                    <div style="margin-bottom: 5px;"><strong>Address:</strong></div>
+                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.subject_of_complaint_address || 'N/A'}</div>
+                  </td>
+                  <td style="padding: 8px; vertical-align: top;">
+                    <div style="margin-bottom: 5px;"><strong>Phone:</strong></div>
+                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.subject_of_complaint_phone || 'N/A'}</div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            
+            <div style="margin-top: 25px;">
+              <h4 style="text-decoration: underline; color: #8B0000; margin-bottom: 15px;">DETAILS OF INCIDENT</h4>
+              <div style="border: 2px solid #000; padding: 15px; min-height: 120px; background: #fff;">
+                ${formData.details_of_incident || 'N/A'}
+              </div>
+            </div>
+            
+            <div style="margin-top: 40px; border-top: 2px solid #8B0000; padding-top: 20px;">
+              <div style="font-size: 10px; color: #666;">
+                <strong>Report ID:</strong> ${sopState.reportId}<br>
+                <strong>Generated:</strong> ${new Date().toLocaleString()}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      else if (formKey === 'intake') {
+        html = `
+          <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; background: white;">
+            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #8B0000; padding-bottom: 20px;">
+              <div style="font-size: 11px; color: #666; letter-spacing: 2px; margin-bottom: 8px;">UNIVERSITY OF PRINCE EDWARD ISLAND</div>
+              <div style="font-size: 16px; color: #8B0000; font-weight: bold; margin-bottom: 8px;">SECURITY SERVICES</div>
+              <div style="font-size: 18px; color: #8B0000; font-weight: bold;">INTAKE FORM</div>
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">
+                  <strong>Complainant Full Name &amp; ID#:</strong><br>
+                  <span style="display: block; margin-top: 5px;">${formData.complainant_full_name_and_id || 'N/A'}</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>Status:</strong><br>
+                  <span style="display: block; margin-top: 5px;">
+                    ${formData.complainant_status_employee ? '☑ Employee' : '☐ Employee'} &nbsp;&nbsp;
+                    ${formData.complainant_status_student ? '☑ Student' : '☐ Student'} &nbsp;&nbsp;
+                    ${formData.complainant_status_visitor ? '☑ Visitor' : '☐ Visitor'}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">
+                  <strong>Phone:</strong> ${formData.complainant_phone_number || 'N/A'} &nbsp;&nbsp;
+                  <strong>Email:</strong> ${formData.complainant_email_address || 'N/A'}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>Security Member Reported To:</strong><br>
+                  <span style="display: block; margin-top: 5px;">${formData.security_member_reported_to || 'N/A'}</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">
+                  <strong>Date/Time Incident Occurred:</strong> ${formData.datetime_incident_occurred || 'N/A'}<br>
+                  <strong>Date/Time Reported:</strong> ${formData.datetime_reported || 'N/A'}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>Location:</strong><br>
+                  <span style="display: block; margin-top: 5px;">${formData.location_incident_occurred || 'N/A'}</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">
+                  <strong>Witnesses:</strong><br>
+                  <div style="margin-top: 5px; white-space: pre-wrap;">${formData.witnesses_names_contact_details || 'N/A'}</div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>Safety Plan Required:</strong> ${formData.safety_plan_required || 'N/A'}
+                </td>
+              </tr>
+            </table>
+            
+            <div style="margin-top: 40px; border-top: 2px solid #8B0000; padding-top: 20px;">
+              <div style="font-size: 10px; color: #666;">
+                <strong>Report ID:</strong> ${sopState.reportId}<br>
+                <strong>Generated:</strong> ${new Date().toLocaleString()}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      else if (formKey === 'hs') {
+        html = `
+          <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; background: white;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <div style="font-size: 18px; color: #8B0000; font-weight: bold; margin-bottom: 5px;">UPEI HEALTH &amp; SAFETY INCIDENT REPORT</div>
+              <div style="font-size: 10px; color: #666;">Contact: 902-566-0901 | incident@upei.ca</div>
+            </div>
+            
+            <div style="background: #84BD00; color: white; padding: 10px; font-weight: bold; margin-top: 20px;">Section A: Affected Party Information</div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9;">
+                  <strong>Status:</strong><br>
+                  ${formData.hs_status_employee ? '☑ Employee' : '☐ Employee'} &nbsp;
+                  ${formData.hs_status_student ? '☑ Student' : '☐ Student'} &nbsp;
+                  ${formData.hs_status_visitor ? '☑ Visitor' : '☐ Visitor'} &nbsp;
+                  ${formData.hs_status_volunteer ? '☑ Volunteer' : '☐ Volunteer'} &nbsp;
+                  ${formData.hs_status_contractor ? '☑ Contractor' : '☐ Contractor'}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">
+                  <strong>Initial:</strong> ${formData.hs_initial || 'N/A'}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9;">
+                  <strong>UPEI Job Title and Department:</strong><br>
+                  <span style="display: block; margin-top: 5px;">${formData.hs_job_title_department || 'N/A'}</span>
+                </td>
+              </tr>
+            </table>
+            
+            <div style="background: #84BD00; color: white; padding: 10px; font-weight: bold; margin-top: 20px;">Section B: Incident Details</div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="width: 33%; padding: 8px; border: 1px solid #ddd;">
+                  <strong>Date:</strong><br>${formData.hs_date_of_incident || 'N/A'}
+                </td>
+                <td style="width: 33%; padding: 8px; border: 1px solid #ddd; background: #f9f9f9;">
+                  <strong>Time:</strong><br>${formData.hs_time_of_incident || 'N/A'}
+                </td>
+                <td style="width: 34%; padding: 8px; border: 1px solid #ddd;">
+                  <strong>Location:</strong><br>${formData.hs_location_of_incident || 'N/A'}
+                </td>
+              </tr>
+            </table>
+            
+            <div style="margin: 20px 0;">
+              <strong>Description of Incident:</strong><br>
+              <div style="border: 2px solid #ddd; padding: 15px; min-height: 100px; margin-top: 10px; background: #fafafa;">
+                ${formData.hs_incident_description || 'N/A'}
+              </div>
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">
+                  <strong>Was first aid administered?</strong> ${formData.hs_first_aid_administered || 'N/A'}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9;">
+                  <strong>First Aid Details:</strong><br>
+                  ${formData.hs_first_aid_details || 'N/A'}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">
+                  <strong>Reported to Supervisor:</strong> ${formData.hs_reported_to_supervisor || 'N/A'}
+                </td>
+              </tr>
+            </table>
+            
+            <div style="margin-top: 40px; border-top: 2px solid #8B0000; padding-top: 20px;">
+              <div style="font-size: 10px; color: #666;">
+                <strong>Report ID:</strong> ${sopState.reportId}<br>
+                <strong>Generated:</strong> ${new Date().toLocaleString()}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      else if (formKey === 'criminal') {
+        html = `
+          <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; background: white;">
+            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #8B0000; padding-bottom: 20px;">
+              <div style="font-size: 11px; color: #666; letter-spacing: 2px; margin-bottom: 8px;">UNIVERSITY OF PRINCE EDWARD ISLAND</div>
+              <div style="font-size: 16px; color: #8B0000; font-weight: bold; margin-bottom: 8px;">SECURITY SERVICES</div>
+              <div style="font-size: 18px; color: #8B0000; font-weight: bold;">CRIMINAL REFERRAL / POLICE SERVICES</div>
+            </div>
+            
+            <div style="background: #1A3A5C; color: white; padding: 12px; font-weight: bold; margin-bottom: 20px;">
+              REFERRAL TYPE
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 15px; border: 2px solid #ddd; background: #f5f5f5;">
+                  <div style="font-size: 16px;">
+                    ${sopState.rcmpSelected ? '☑' : '☐'} <strong>RCMP (Royal Canadian Mounted Police)</strong>
+                  </div>
+                  <div style="font-size: 16px; margin-top: 10px;">
+                    ${sopState.cpsSelected ? '☑' : '☐'} <strong>CPS (Charlottetown Police Services)</strong>
+                  </div>
+                </td>
+              </tr>
+            </table>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="width: 50%; padding: 10px; border: 1px solid #ddd;">
+                  <strong>Date of Referral:</strong><br>
+                  <span style="display: block; margin-top: 5px;">${formData.criminal_date_of_referral || 'N/A'}</span>
+                </td>
+                <td style="width: 50%; padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
+                  <strong>Location:</strong><br>
+                  <span style="display: block; margin-top: 5px;">${formData.criminal_location || 'N/A'}</span>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>Investigating Officer:</strong><br>
+                  <span style="display: block; margin-top: 5px;">${formData.criminal_investigating_officer || 'N/A'}</span>
+                </td>
+              </tr>
+            </table>
+            
+            <div style="margin: 20px 0;">
+              <strong>Incident / Criminal Details:</strong><br>
+              <div style="border: 2px solid #000; padding: 15px; min-height: 120px; margin-top: 10px; background: #fff;">
+                ${formData.criminal_incident_details || 'N/A'}
+              </div>
+            </div>
+            
+            <div style="margin-top: 40px; border-top: 2px solid #8B0000; padding-top: 20px;">
+              <div style="font-size: 10px; color: #666;">
+                <strong>Report ID:</strong> ${sopState.reportId}<br>
+                <strong>Generated:</strong> ${new Date().toLocaleString()}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      else if (formKey === 'cctv') {
+        html = `
+          <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; background: white;">
+            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #8B0000; padding-bottom: 20px;">
+              <div style="font-size: 11px; color: #666; letter-spacing: 2px; margin-bottom: 8px;">UNIVERSITY OF PRINCE EDWARD ISLAND</div>
+              <div style="font-size: 16px; color: #8B0000; font-weight: bold; margin-bottom: 8px;">SECURITY SERVICES</div>
+              <div style="font-size: 18px; color: #8B0000; font-weight: bold;">CCTV ACCESS REQUEST FORM</div>
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">
+                  <strong>Department:</strong> ${formData.cctv_department || 'N/A'}
+                </td>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>Request Date:</strong> ${formData.cctv_request_date || 'N/A'}
+                </td>
+              </tr>
+            </table>
+            
+            <div style="background: #1A3A5C; color: white; padding: 10px; font-weight: bold; margin: 20px 0 10px 0;">
+              REQUESTED BY POLICE SERVICES
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                  ${formData.cctv_requested_by_cps ? '☑' : '☐'} <strong>CPS</strong> &nbsp;&nbsp;&nbsp;
+                  ${formData.cctv_requested_by_rcmp ? '☑' : '☐'} <strong>RCMP</strong>
+                </td>
+              </tr>
+            </table>
+            
+            <div style="background: #1A3A5C; color: white; padding: 10px; font-weight: bold; margin: 20px 0 10px 0;">
+              REQUESTOR TYPE
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
+                  ${formData.cctv_faculty ? '☑' : '☐'} Faculty &nbsp;&nbsp;
+                  ${formData.cctv_staff ? '☑' : '☐'} Staff &nbsp;&nbsp;
+                  ${formData.cctv_student ? '☑' : '☐'} Student &nbsp;&nbsp;
+                  ${formData.cctv_atip ? '☑' : '☐'} ATIP
+                </td>
+              </tr>
+            </table>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>Start Date/Time:</strong> ${formData.cctv_start_datetime || 'N/A'}
+                </td>
+                <td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
+                  <strong>Finish Date/Time:</strong> ${formData.cctv_finish_datetime || 'N/A'}
+                </td>
+              </tr>
+            </table>
+            
+            <div style="background: #1A3A5C; color: white; padding: 10px; font-weight: bold; margin: 20px 0 10px 0;">
+              REQUESTOR INFORMATION
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Last Name:</strong> ${formData.cctv_requestor_last_name || 'N/A'}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9;"><strong>First Name:</strong> ${formData.cctv_requestor_first_name || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Building:</strong> ${formData.cctv_building || 'N/A'}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Room:</strong> ${formData.cctv_room_number || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Supervisor:</strong> ${formData.cctv_supervisor || 'N/A'}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Phone:</strong> ${formData.cctv_office_phone || 'N/A'}</td>
+              </tr>
+            </table>
+            
+            <div style="margin: 20px 0;">
+              <strong>CCTV Camera Review Requested:</strong><br>
+              <div style="border: 2px solid #ddd; padding: 15px; min-height: 80px; margin-top: 10px; background: #fafafa;">
+                ${formData.cctv_camera_review_requested || 'N/A'}
+              </div>
+            </div>
+            
+            <div style="margin-top: 40px; border-top: 2px solid #8B0000; padding-top: 20px;">
+              <div style="font-size: 10px; color: #666;">
+                <strong>Report ID:</strong> ${sopState.reportId}<br>
+                <strong>Generated:</strong> ${new Date().toLocaleString()}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      else if (formKey === 'poi') {
+        html = `
+          <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; background: white;">
+            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #8B0000; padding-bottom: 20px;">
+              <div style="font-size: 11px; color: #666; letter-spacing: 2px; margin-bottom: 8px;">UNIVERSITY OF PRINCE EDWARD ISLAND</div>
+              <div style="font-size: 16px; color: #8B0000; font-weight: bold; margin-bottom: 8px;">SECURITY SERVICES</div>
+              <div style="font-size: 18px; color: #8B0000; font-weight: bold;">PERSON OF INTEREST (POI) FORM</div>
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="width: 50%; padding: 10px; border: 1px solid #ddd; background: #f5f5f5;">
+                  <strong>Incident Date:</strong><br>${formData.poi_incident_date || 'N/A'}
+                </td>
+                <td style="width: 50%; padding: 10px; border: 1px solid #ddd;">
+                  <strong>Incident Type:</strong><br>${formData.poi_incident_type || 'N/A'}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>Occurrence #:</strong><br>${formData.poi_occurrence_number || 'N/A'}
+                </td>
+                <td style="padding: 10px; border: 1px solid #ddd; background: #f5f5f5;">
+                  <strong>Police File #:</strong><br>${formData.poi_police_file_number || 'N/A'}
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>Investigating Attendant:</strong><br>${formData.poi_investigating_attendant || 'N/A'}
+                </td>
+              </tr>
+            </table>
+            
+            <div style="background: #1A3A5C; color: white; padding: 10px; font-weight: bold; margin: 20px 0 10px 0;">
+              PERSON OF INTEREST DETAILS
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
+                  <strong>Last Name:</strong> ${formData.poi_last_name || 'N/A'}
+                </td>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>First Name:</strong> ${formData.poi_first_name || 'N/A'}
+                </td>
+                <td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
+                  <strong>Middle Name:</strong> ${formData.poi_middle_name || 'N/A'}
+                </td>
+              </tr>
+              <tr>
+                <td colspan="3" style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>Date of Birth:</strong> ${formData.poi_dob || 'N/A'}
+                </td>
+              </tr>
+            </table>
+            
+            <div style="background: #1A3A5C; color: white; padding: 10px; font-weight: bold; margin: 20px 0 10px 0;">
+              ADDRESS
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
+                  <strong>Street:</strong><br>${formData.poi_street || 'N/A'}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>City/Town:</strong> ${formData.poi_city_town || 'N/A'} &nbsp;&nbsp;
+                  <strong>Postal Code:</strong> ${formData.poi_postal_code || 'N/A'}
+                </td>
+              </tr>
+            </table>
+            
+            <div style="margin: 20px 0;">
+              <strong>Description of Incident:</strong><br>
+              <div style="border: 2px solid #ddd; padding: 15px; min-height: 100px; margin-top: 10px; background: #fafafa;">
+                ${formData.poi_description_of_incident || 'N/A'}
+              </div>
+            </div>
+            
+            <div style="background: #1A3A5C; color: white; padding: 10px; font-weight: bold; margin: 20px 0 10px 0;">
+              PREVIOUS INCIDENTS
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
+                  <strong>Date:</strong> ${formData.poi_previous_incident_date || 'N/A'}
+                </td>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                  <strong>Occurrence:</strong> ${formData.poi_previous_occurrence || 'N/A'}
+                </td>
+              </tr>
+            </table>
+            
+            <div style="margin-top: 40px; border-top: 2px solid #8B0000; padding-top: 20px;">
+              <div style="font-size: 10px; color: #666;">
+                <strong>Report ID:</strong> ${sopState.reportId}<br>
+                <strong>Generated:</strong> ${new Date().toLocaleString()}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      return html;
+    }
+    
+    // === PDF EXPORT USING ORIGINAL FORM TEMPLATES ===
+    
+    async function exportFormPDF(formKey) {
+      // Validate dispatch log for incident reports
+      if (sopState.routing === 'dispatch' && !validateDispatchLog()) {
+        return;
+      }
+      
+      // Generate report ID if not already generated
+      if (sopState.routing === 'dispatch' && !sopState.reportId) {
+        try {
+          const dispatchLog = sopState.forms['incident']?.dispatch_log;
+          sopState.reportId = generateReportId(dispatchLog);
+        } catch (error) {
+          alert(error.message);
+          return;
+        }
+      }
+      
+      const form = FORM_LIB[formKey];
+      const fdata = sopState.forms[formKey];
+      
+      if (!fdata) {
+        showToast('No data available for this form', 'error');
+        return;
+      }
+      
+      showToast('Generating official UPEI form PDF with your data...', 'info');
+      
+      try {
+        // Generate HTML that matches the original UPEI form template
+        const originalFormHTML = generateOriginalFormHTML(formKey, fdata);
+        
+        // Create temporary container for rendering
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = originalFormHTML;
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '0';
+        tempDiv.style.width = '900px';
+        document.body.appendChild(tempDiv);
+        
+        // Use html2canvas to render the HTML form
+        const canvas = await html2canvas(tempDiv, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          logging: false,
+          width: 900,
+          windowWidth: 900
+        });
+        
+        // Remove temporary container
+        document.body.removeChild(tempDiv);
+        
+        // Create PDF from canvas
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        
+        const imgData = canvas.toDataURL('image/png');
+        const pageWidth = 210; // A4 width in mm
+        const pageHeight = 297; // A4 height in mm
+        const imgWidth = pageWidth - 20; // Leave 10mm margin on each side
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        let heightLeft = imgHeight;
+        let position = 10;
+        
+        // Add first page
+        doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - 20);
+        
+        // Add additional pages if needed
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight + 10;
+          doc.addPage();
+          doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+          heightLeft -= (pageHeight - 20);
+        }
+        
+        // Add supporting evidence images on separate pages
+        if (fdata._files && Object.keys(fdata._files).length > 0) {
+          doc.addPage();
+          
+          // Evidence header
+          doc.setFontSize(14);
+          doc.setTextColor(139, 0, 0);
+          doc.setFont(undefined, 'bold');
+          doc.text('Supporting Evidence - Attached Photos', 14, 20);
+          
+          doc.setDrawColor(212, 165, 116);
+          doc.setLineWidth(1);
+          doc.line(14, 25, 196, 25);
+          
+          let yPos = 35;
+          
+          for (let fieldName in fdata._files) {
+            const fileData = fdata._files[fieldName];
+            
+            if (yPos > 220) {
+              doc.addPage();
+              yPos = 20;
+            }
+            
+            // Image label
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Evidence Photo: ${fieldName.replace(/_/g, ' ')}`, 14, yPos);
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(8);
+            doc.text(`File: ${fileData.name}`, 14, yPos + 5);
+            yPos += 12;
+            
+            // Add image
+            try {
+              const imgWidth = 170;
+              const imgHeight = 100;
+              doc.addImage(fileData.data, 'JPEG', 20, yPos, imgWidth, imgHeight);
+              yPos += imgHeight + 15;
+            } catch (imgError) {
+              console.error('Error embedding image:', imgError);
+              doc.setTextColor(200, 0, 0);
+              doc.text('[Image could not be embedded in PDF]', 20, yPos);
+              yPos += 10;
+            }
+          }
+        }
+        
+        // Add professional footer to all pages
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          
+          doc.setDrawColor(212, 165, 116);
+          doc.setLineWidth(0.5);
+          doc.line(14, 282, 196, 282);
+          
+          doc.setFontSize(7);
+          doc.setTextColor(120, 120, 120);
+          doc.text(`Page ${i} of ${totalPages}`, 14, 287);
+          doc.text('UPEI Security Services', 105, 287, { align: 'center' });
+          doc.setTextColor(139, 0, 0);
+          doc.setFont(undefined, 'bold');
+          doc.text('CONFIDENTIAL', 196, 287, { align: 'right' });
+        }
+        
+        // Save PDF with official naming
+        const timestamp = new Date().toISOString().split('T')[0];
+        const filename = `UPEI_${form.title.replace(/\s/g, '_')}_${sopState.reportId}_${timestamp}.pdf`;
+        doc.save(filename);
+        
+        showToast(`Official UPEI form exported: ${filename}`, 'success');
+      } catch (error) {
+        console.error('PDF generation error:', error);
+        showToast('Error generating PDF. Please try again.', 'error');
+      }
+    }
+    
+    async function exportAllFormsPDF() {
+      // Validate dispatch log for incident reports
+      if (sopState.routing === 'dispatch' && !validateDispatchLog()) {
+        return;
+      }
+      
+      // Generate report ID if not already generated
+      if (sopState.routing === 'dispatch' && !sopState.reportId) {
+        try {
+          const dispatchLog = sopState.forms['incident']?.dispatch_log;
+          sopState.reportId = generateReportId(dispatchLog);
+        } catch (error) {
+          alert(error.message);
+          return;
+        }
+      }
+      
+      showToast('Generating comprehensive PDF with all official UPEI forms...', 'info');
+      
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let isFirstForm = true;
+        
+        // Process each form using original templates
+        const formKeys = Object.keys(sopState.forms);
+        
+        for (const formKey of formKeys) {
+          const formData = sopState.forms[formKey];
+          const formInfo = FORM_LIB[formKey];
+          
+          // Add page break between forms (except for first form)
+          if (!isFirstForm) {
+            doc.addPage();
+          }
+          isFirstForm = false;
+          
+          // Generate HTML for this form using original template
+          const originalFormHTML = generateOriginalFormHTML(formKey, formData);
+          
+          // Create temporary container
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = originalFormHTML;
+          tempDiv.style.position = 'absolute';
+          tempDiv.style.left = '-9999px';
+          tempDiv.style.top = '0';
+          tempDiv.style.width = '900px';
+          document.body.appendChild(tempDiv);
+          
+          // Render to canvas
+          const canvas = await html2canvas(tempDiv, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            width: 900,
+            windowWidth: 900
+          });
+          
+          // Remove temporary container
+          document.body.removeChild(tempDiv);
+          
+          // Add canvas to PDF
+          const imgData = canvas.toDataURL('image/png');
+          const pageWidth = 210;
+          const pageHeight = 297;
+          const imgWidth = pageWidth - 20;
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          
+          let heightLeft = imgHeight;
+          let position = 10;
+          
+          // Add form pages
+          doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+          heightLeft -= (pageHeight - 20);
+          
+          while (heightLeft > 0) {
+            position = heightLeft - imgHeight + 10;
+            doc.addPage();
+            doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+            heightLeft -= (pageHeight - 20);
+          }
+          
+          // Add supporting evidence images for this form
+          if (formData._files && Object.keys(formData._files).length > 0) {
+            doc.addPage();
+            
+            doc.setFontSize(14);
+            doc.setTextColor(139, 0, 0);
+            doc.setFont(undefined, 'bold');
+            doc.text(`${formInfo.title} - Supporting Evidence`, 14, 20);
+            
+            doc.setDrawColor(212, 165, 116);
+            doc.setLineWidth(1);
+            doc.line(14, 25, 196, 25);
+            
+            let yPos = 35;
+            
+            for (let fieldName in formData._files) {
+              const fileData = formData._files[fieldName];
+              
+              if (yPos > 220) {
+                doc.addPage();
+                yPos = 20;
+              }
+              
+              doc.setFontSize(10);
+              doc.setTextColor(0, 0, 0);
+              doc.setFont(undefined, 'bold');
+              doc.text(`Photo: ${fieldName.replace(/_/g, ' ')}`, 14, yPos);
+              doc.setFont(undefined, 'normal');
+              doc.setFontSize(8);
+              doc.text(`File: ${fileData.name}`, 14, yPos + 5);
+              yPos += 12;
+              
+              try {
+                const imgW = 170;
+                const imgH = 100;
+                doc.addImage(fileData.data, 'JPEG', 20, yPos, imgW, imgH);
+                yPos += imgH + 15;
+              } catch (imgError) {
+                console.error('Error embedding image:', imgError);
+                doc.setTextColor(200, 0, 0);
+                doc.text('[Image could not be embedded]', 20, yPos);
+                yPos += 10;
+              }
+            }
+          }
+        }
+        
+        // Add footer to all pages
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          
+          doc.setDrawColor(212, 165, 116);
+          doc.setLineWidth(0.5);
+          doc.line(14, 282, 196, 282);
+          
+          doc.setFontSize(7);
+          doc.setTextColor(120, 120, 120);
+          doc.text(`Page ${i} of ${totalPages}`, 14, 287);
+          doc.text('UPEI Security Services - Complete Report', 105, 287, { align: 'center' });
+          doc.setTextColor(139, 0, 0);
+          doc.setFont(undefined, 'bold');
+          doc.text('CONFIDENTIAL', 196, 287, { align: 'right' });
+        }
+        
+        const timestamp = new Date().toISOString().split('T')[0];
+        const filename = `UPEI_Complete_Report_${sopState.reportId}_${timestamp}.pdf`;
+        doc.save(filename);
+        showToast(`Complete report exported: ${filename}`, 'success');
+      } catch (error) {
+        console.error('PDF generation error:', error);
+        showToast('Error generating PDF', 'error');
+      }
+    }
+    
+    function exportAsJSON() {
+      const exportData = {
+        reportId: sopState.reportId,
+        timestamp: new Date().toISOString(),
+        routing: sopState.routing,
+        incidentType: sopState.incidentType,
+        category: sopState.hsOrCriminal,
+        cctvAvailable: sopState.cctvAvailable,
+        poiAvailable: sopState.poiAvailable,
+        forms: sopState.forms
+      };
+      
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `UPEI_Report_${sopState.reportId}_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      showToast('Data exported as JSON', 'success');
+    }
+    
+    function exportAsCSV() {
+      let csv = 'Form,Field,Value\n';
+      
+      for (const [formKey, formData] of Object.entries(sopState.forms)) {
+        const formTitle = FORM_LIB[formKey].title;
+        for (const [key, value] of Object.entries(formData)) {
+          if (typeof value === 'object') continue;
+          const escapedValue = String(value).replace(/"/g, '""');
+          csv += `"${formTitle}","${key}","${escapedValue}"\n`;
+        }
+      }
+      
+      const dataBlob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `UPEI_Report_${sopState.reportId}_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      showToast('Data exported as CSV', 'success');
+    }
+    
+    // === START NEW REPORT ===
+    
+    function startNew() {
+      if (confirm('Are you sure you want to start a new report? Current data will be cleared.')) {
+        sopState = {
+          stepIdx: 0,
+          routing: null,
+          incidentType: null,
+          hsOrCriminal: null,
+          cctvAvailable: null,
+          poiAvailable: null,
+          rcmpSelected: false,
+          cpsSelected: false,
+          forms: {},
+          adminMode: false,
+          reportId: null
+        };
+        renderStage();
+        showToast('Ready for new report', 'info');
+      }
+    }
+    
+    // === ADMIN MODE ===
+    
+    function toggleAdminMode() {
+      sopState.adminMode = !sopState.adminMode;
+      document.getElementById('adminPanel').classList.toggle('d-none', !sopState.adminMode);
+      document.getElementById('incidentForm').classList.toggle('d-none', sopState.adminMode);
+      document.getElementById('progressStepper').classList.toggle('d-none', sopState.adminMode);
+      document.getElementById('storageWarning').classList.toggle('d-none', sopState.adminMode);
+      
+      if (sopState.adminMode) {
+        renderAdminReports();
+        showToast('Admin mode activated', 'info');
+      } else {
+        showToast('Admin mode deactivated', 'info');
+      }
+    }
+    
+    function renderAdminReports() {
+      const target = document.getElementById('adminReports');
+      const filterType = document.getElementById('filterType')?.value || '';
+      
+      let filtered = incidentReports;
+      if (filterType) {
+        filtered = incidentReports.filter(r => r.incidentType === filterType);
+      }
+      
+      // Update statistics
+      const today = new Date().toDateString();
+      const todayCount = incidentReports.filter(r => 
+        new Date(r.timeSaved).toDateString() === today
+      ).length;
+      
+      document.getElementById('totalReports').textContent = incidentReports.length;
+      document.getElementById('incidentReports').textContent = 
+        incidentReports.filter(r => r.incidentType === 'incident').length;
+      document.getElementById('intakeReports').textContent = 
+        incidentReports.filter(r => r.incidentType === 'intake').length;
+      document.getElementById('todayReports').textContent = todayCount;
+      
+      if (!filtered.length) {
+        target.innerHTML = `<div class="alert alert-secondary">
+          <i class="bi bi-inbox"></i> No submitted reports yet.
+        </div>`;
+        return;
+      }
+      
+      target.innerHTML = filtered.map((r, i) => `
+        <div class="card admin-report-card mb-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <h6 class="card-title mb-1">Report #${incidentReports.indexOf(r) + 1}</h6>
+                <span class="report-id">${r.reportId || 'N/A'}</span>
+              </div>
+              <button class="btn btn-sm btn-outline-danger" onclick="deleteReport(${incidentReports.indexOf(r)})">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-6">
+                <small class="text-muted">Routing:</small><br>
+                <strong>${r.routing === 'dispatch' ? 'Dispatched' : 'Received by Complainant'}</strong>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted">Type:</small><br>
+                <strong>${r.incidentType === 'incident' ? 'Incident Report (Dispatched)' : 'Intake Form (Complainant)'}</strong>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-6">
+                <small class="text-muted">Category:</small><br>
+                <strong>${r.hsOrCriminal === 'hs' ? 'Health & Safety' : r.hsOrCriminal === 'criminal' ? 'Criminal/RCMP/CPS Referral' : 'N/A'}</strong>
+                ${r.hsOrCriminal === 'criminal' && (r.rcmpSelected || r.cpsSelected) ? '<br><small class="text-muted">' + (r.rcmpSelected ? '☑ RCMP ' : '') + (r.cpsSelected ? '☑ CPS' : '') + '</small>' : ''}
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted">Submitted:</small><br>
+                <strong>${r.timeSaved ? new Date(r.timeSaved).toLocaleString() : 'N/A'}</strong>
+              </div>
+            </div>
+            <details>
+              <summary class="btn btn-sm btn-outline-secondary mt-2">View Form Data</summary>
+              <div class="mt-3">
+                <pre class="bg-light p-3 rounded" style="white-space:pre-wrap;font-size:0.85rem;max-height:400px;overflow-y:auto;">${
+                  Object.entries(r.forms).map(([k, v]) => 
+                    `<strong>${FORM_LIB[k]?.title || k}:</strong>\n${JSON.stringify(v, null, 2)}`
+                  ).join('\n\n')
+                }</pre>
+              </div>
+            </details>
+            <div class="mt-3">
+              <button class="btn btn-sm btn-success me-2" onclick="viewReportPDF(${incidentReports.indexOf(r)})">
+                <i class="bi bi-file-earmark-pdf"></i> View as PDF
+              </button>
+              <button class="btn btn-sm btn-outline-primary" onclick="viewReportImages(${incidentReports.indexOf(r)})">
+                <i class="bi bi-images"></i> View Images
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function deleteReport(index) {
+      if (confirm('Are you sure you want to delete this report?')) {
+        incidentReports.splice(index, 1);
+        renderAdminReports();
+        showToast('Report deleted', 'success');
+      }
+    }
+    
+    function clearAllReports() {
+      if (confirm('Are you sure you want to delete ALL reports? This action cannot be undone.')) {
+        incidentReports = [];
+        renderAdminReports();
+        showToast('All reports cleared', 'success');
+      }
+    }
+    
+    function viewReportPDF(index) {
+      const report = incidentReports[index];
+      if (!report) {
+        showToast('Report not found', 'error');
+        return;
+      }
+      
+      // Generate PDF for the report
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Header
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text('UNIVERSITY OF PRINCE EDWARD ISLAND', 105, 15, { align: 'center' });
+        
+        doc.setFontSize(18);
+        doc.setTextColor(139, 0, 0);
+        doc.text('Security Services', 105, 23, { align: 'center' });
+        
+        doc.setFontSize(12);
+        doc.setTextColor(212, 165, 116);
+        doc.text('Incident Report', 105, 29, { align: 'center' });
+        
+        doc.setDrawColor(212, 165, 116);
+        doc.setLineWidth(1);
+        doc.line(14, 32, 196, 32);
+        
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Report ID: ${report.reportId || 'N/A'}`, 14, 40);
+        doc.text(`Submitted: ${report.timeSaved ? new Date(report.timeSaved).toLocaleString() : 'N/A'}`, 14, 45);
+        doc.text(`Type: ${report.routing === 'dispatch' ? 'Incident Report (Dispatched)' : 'Intake Form (Complainant)'} - ${report.hsOrCriminal === 'hs' ? 'Health & Safety' : 'Criminal'}`, 14, 50);
+        
+        doc.setDrawColor(217, 217, 217);
+        doc.setLineWidth(0.5);
+        doc.line(14, 54, 196, 54);
+        
+        let y = 62;
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        
+        // Render all forms
+        for (const [formKey, formData] of Object.entries(report.forms)) {
+          doc.setFont(undefined, 'bold');
+          doc.setFontSize(12);
+          doc.setTextColor(139, 0, 0);
+          doc.text(FORM_LIB[formKey]?.title || formKey, 14, y);
+          y += 8;
+          
+          doc.setFont(undefined, 'normal');
+          doc.setFontSize(10);
+          doc.setTextColor(0, 0, 0);
+          
+          for (let k in formData) {
+            if (typeof formData[k] === 'object') continue;
+            
+            let label = k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            doc.setFont(undefined, 'bold');
+            doc.text(`${label}:`, 14, y);
+            
+            doc.setFont(undefined, 'normal');
+            const value = String(formData[k] || 'N/A');
+            const lines = doc.splitTextToSize(value, 170);
+            
+            y += 5;
+            lines.forEach(line => {
+              if (y > 280) {
+                doc.addPage();
+                y = 20;
+              }
+              doc.text(line, 18, y);
+              y += 5;
+            });
+            
+            y += 3;
+            if (y > 275) {
+              doc.addPage();
+              y = 20;
+            }
+          }
+          y += 5;
+        }
+        
+        // Open in new window
+        const pdfBlob = doc.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        window.open(pdfUrl, '_blank');
+        
+        showToast('PDF opened in new tab', 'success');
+      } catch (error) {
+        console.error('PDF generation error:', error);
+        showToast('Error generating PDF', 'error');
+      }
+    }
+    
+    function viewReportImages(index) {
+      const report = incidentReports[index];
+      if (!report) {
+        showToast('Report not found', 'error');
+        return;
+      }
+      
+      // Collect all image references from the report
+      const images = [];
+      for (const [formKey, formData] of Object.entries(report.forms)) {
+        for (const [key, value] of Object.entries(formData)) {
+          if (key.includes('evidence') || key.includes('photo')) {
+            if (typeof value === 'string' && value.startsWith('[File:')) {
+              images.push({ form: FORM_LIB[formKey]?.title || formKey, field: key, file: value });
+            }
+          }
+        }
+      }
+      
+      if (images.length === 0) {
+        showToast('No images attached to this report', 'info');
+        return;
+      }
+      
+      // Create modal to display images
+      const modalHtml = `
+        <div class="modal fade" id="imageModal" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Report Images - ${report.reportId}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div class="alert alert-info">
+                  <i class="bi bi-info-circle"></i> ${images.length} image(s) attached to this report
+                </div>
+                ${images.map((img, i) => `
+                  <div class="mb-3 p-3 border rounded">
+                    <strong>${img.form} - ${img.field.replace(/_/g, ' ')}</strong><br>
+                    <small class="text-muted">${img.file}</small>
+                  </div>
+                `).join('')}
+                <div class="alert alert-warning mt-3">
+                  <i class="bi bi-exclamation-triangle"></i> Note: Image data is stored in memory only. Full image preview requires file storage implementation.
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Remove existing modal if any
+      const existingModal = document.getElementById('imageModal');
+      if (existingModal) existingModal.remove();
+      
+      // Add modal to page
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+      modal.show();
+      
+      // Clean up modal when closed
+      document.getElementById('imageModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+      });
+    }
+    
+    function exportAllReportsJSON() {
+      if (!incidentReports.length) {
+        showToast('No reports to export', 'warning');
+        return;
+      }
+      
+      const dataStr = JSON.stringify(incidentReports, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `UPEI_All_Reports_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      showToast('Reports exported as JSON', 'success');
+    }
+    
+    // === SEARCH FUNCTIONALITY ===
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('searchReports');
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          const searchTerm = this.value.toLowerCase();
+          if (!searchTerm) {
+            renderAdminReports();
+            return;
+          }
+          
+          const filtered = incidentReports.filter(r => {
+            const searchable = JSON.stringify(r).toLowerCase();
+            return searchable.includes(searchTerm);
+          });
+          
+          // Render filtered results (simplified)
+          const target = document.getElementById('adminReports');
+          if (!filtered.length) {
+            target.innerHTML = '<div class="alert alert-secondary">No matching reports found.</div>';
+          }
+        });
+      }
+    });
+    
+    // === INITIALIZATION ===
+    
+    window.onload = function() {
+      renderStage();
+      updateDateTime();
+      // initialise global auto-save listeners once
+      setupAutoSaveListeners();
+      setInterval(updateDateTime, 1000);
+      
+      // Update print timestamp
+      document.getElementById('printTimestamp').textContent = 
+        `Generated: ${new Date().toLocaleString()}`;
+    };
+  </script>
+</body>
+</html>
