@@ -1981,555 +1981,7 @@ function setupAutoSaveListeners() {
       window.print();
     }
     
-    // === ORIGINAL FORM TEMPLATE HTML GENERATION ===
-    
-    function generateOriginalFormHTML(formKey, formData) {
-      let html = '';
-      
-      if (formKey === 'incident') {
-        html = `
-          <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; background: white;">
-            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #8B0000; padding-bottom: 20px;">
-              <div style="font-size: 11px; color: #666; letter-spacing: 2px; margin-bottom: 8px;">UNIVERSITY OF PRINCE EDWARD ISLAND</div>
-              <div style="font-size: 16px; color: #8B0000; font-weight: bold; margin-bottom: 8px;">DEPARTMENT OF SECURITY SERVICES</div>
-              <div style="font-size: 18px; color: #8B0000; font-weight: bold;">~ INCIDENT REPORT ~</div>
-            </div>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="width: 50%; padding: 8px; vertical-align: top;">
-                  <div style="margin-bottom: 5px;"><strong>Nature of Incident:</strong></div>
-                  <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.details_of_incident ? formData.details_of_incident.substring(0, 50) : 'N/A'}</div>
-                </td>
-                <td style="width: 50%; padding: 8px; vertical-align: top;">
-                  <div style="margin-bottom: 5px;"><strong>Date:</strong></div>
-                  <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.date_of_incident || 'N/A'}</div>
-                </td>
-              </tr>
-            </table>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 8px; vertical-align: top;">
-                  <div style="margin-bottom: 5px;"><strong>Dispatch log:</strong></div>
-                  <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.dispatch_log || 'N/A'}</div>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; vertical-align: top;">
-                  <div style="margin-bottom: 5px;"><strong>Attendant:</strong></div>
-                  <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.attendant || 'N/A'}</div>
-                </td>
-              </tr>
-            </table>
-            
-            <div style="margin-top: 25px;">
-              <h4 style="text-decoration: underline; color: #8B0000; margin-bottom: 15px;">INFORMATION OF INCIDENT</h4>
-              <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                  <td style="width: 33%; padding: 8px; vertical-align: top;">
-                    <div style="margin-bottom: 5px;"><strong>Date:</strong></div>
-                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.date_of_incident || 'N/A'}</div>
-                  </td>
-                  <td style="width: 33%; padding: 8px; vertical-align: top;">
-                    <div style="margin-bottom: 5px;"><strong>Time:</strong></div>
-                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.time_of_incident || 'N/A'}</div>
-                  </td>
-                  <td style="width: 34%; padding: 8px; vertical-align: top;">
-                    <div style="margin-bottom: 5px;"><strong>Location:</strong></div>
-                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.location_of_incident || 'N/A'}</div>
-                  </td>
-                </tr>
-              </table>
-            </div>
-            
-            <div style="margin-top: 25px;">
-              <h4 style="text-decoration: underline; color: #8B0000; margin-bottom: 15px;">COMPLAINANT</h4>
-              <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                  <td style="width: 50%; padding: 8px; vertical-align: top;">
-                    <div style="margin-bottom: 5px;"><strong>Name:</strong></div>
-                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.complainant_name || 'N/A'}</div>
-                  </td>
-                  <td style="width: 50%; padding: 8px; vertical-align: top;">
-                    <div style="margin-bottom: 5px;"><strong>DOB:</strong></div>
-                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.complainant_dob || 'N/A'}</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px; vertical-align: top;">
-                    <div style="margin-bottom: 5px;"><strong>Address:</strong></div>
-                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.complainant_address || 'N/A'}</div>
-                  </td>
-                  <td style="padding: 8px; vertical-align: top;">
-                    <div style="margin-bottom: 5px;"><strong>Phone:</strong></div>
-                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.complainant_phone || 'N/A'}</div>
-                  </td>
-                </tr>
-              </table>
-            </div>
-            
-            <div style="margin-top: 25px;">
-              <h4 style="text-decoration: underline; color: #8B0000; margin-bottom: 15px;">SUBJECT OF COMPLAINT</h4>
-              <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                  <td style="width: 50%; padding: 8px; vertical-align: top;">
-                    <div style="margin-bottom: 5px;"><strong>Name:</strong></div>
-                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.subject_of_complaint_name || 'N/A'}</div>
-                  </td>
-                  <td style="width: 50%; padding: 8px; vertical-align: top;">
-                    <div style="margin-bottom: 5px;"><strong>DOB:</strong></div>
-                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.subject_of_complaint_dob || 'N/A'}</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px; vertical-align: top;">
-                    <div style="margin-bottom: 5px;"><strong>Address:</strong></div>
-                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.subject_of_complaint_address || 'N/A'}</div>
-                  </td>
-                  <td style="padding: 8px; vertical-align: top;">
-                    <div style="margin-bottom: 5px;"><strong>Phone:</strong></div>
-                    <div style="border-bottom: 1px solid #000; padding: 5px 0; min-height: 24px;">${formData.subject_of_complaint_phone || 'N/A'}</div>
-                  </td>
-                </tr>
-              </table>
-            </div>
-            
-            <div style="margin-top: 25px;">
-              <h4 style="text-decoration: underline; color: #8B0000; margin-bottom: 15px;">DETAILS OF INCIDENT</h4>
-              <div style="border: 2px solid #000; padding: 15px; min-height: 120px; background: #fff;">
-                ${formData.details_of_incident || 'N/A'}
-              </div>
-            </div>
-            
-            <div style="margin-top: 40px; border-top: 2px solid #8B0000; padding-top: 20px;">
-              <div style="font-size: 10px; color: #666;">
-                <strong>Report ID:</strong> ${sopState.reportId}<br>
-                <strong>Generated:</strong> ${new Date().toLocaleString()}
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      
-      else if (formKey === 'intake') {
-        html = `
-          <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; background: white;">
-            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #8B0000; padding-bottom: 20px;">
-              <div style="font-size: 11px; color: #666; letter-spacing: 2px; margin-bottom: 8px;">UNIVERSITY OF PRINCE EDWARD ISLAND</div>
-              <div style="font-size: 16px; color: #8B0000; font-weight: bold; margin-bottom: 8px;">SECURITY SERVICES</div>
-              <div style="font-size: 18px; color: #8B0000; font-weight: bold;">INTAKE FORM</div>
-            </div>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">
-                  <strong>Complainant Full Name &amp; ID#:</strong><br>
-                  <span style="display: block; margin-top: 5px;">${formData.complainant_full_name_and_id || 'N/A'}</span>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>Status:</strong><br>
-                  <span style="display: block; margin-top: 5px;">
-                    ${formData.complainant_status_employee ? '☑ Employee' : '☐ Employee'} &nbsp;&nbsp;
-                    ${formData.complainant_status_student ? '☑ Student' : '☐ Student'} &nbsp;&nbsp;
-                    ${formData.complainant_status_visitor ? '☑ Visitor' : '☐ Visitor'}
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">
-                  <strong>Phone:</strong> ${formData.complainant_phone_number || 'N/A'} &nbsp;&nbsp;
-                  <strong>Email:</strong> ${formData.complainant_email_address || 'N/A'}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>Security Member Reported To:</strong><br>
-                  <span style="display: block; margin-top: 5px;">${formData.security_member_reported_to || 'N/A'}</span>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">
-                  <strong>Date/Time Incident Occurred:</strong> ${formData.datetime_incident_occurred || 'N/A'}<br>
-                  <strong>Date/Time Reported:</strong> ${formData.datetime_reported || 'N/A'}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>Location:</strong><br>
-                  <span style="display: block; margin-top: 5px;">${formData.location_incident_occurred || 'N/A'}</span>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">
-                  <strong>Witnesses:</strong><br>
-                  <div style="margin-top: 5px; white-space: pre-wrap;">${formData.witnesses_names_contact_details || 'N/A'}</div>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>Safety Plan Required:</strong> ${formData.safety_plan_required || 'N/A'}
-                </td>
-              </tr>
-            </table>
-            
-            <div style="margin-top: 40px; border-top: 2px solid #8B0000; padding-top: 20px;">
-              <div style="font-size: 10px; color: #666;">
-                <strong>Report ID:</strong> ${sopState.reportId}<br>
-                <strong>Generated:</strong> ${new Date().toLocaleString()}
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      
-      else if (formKey === 'hs') {
-        html = `
-          <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; background: white;">
-            <div style="text-align: center; margin-bottom: 20px;">
-              <div style="font-size: 18px; color: #8B0000; font-weight: bold; margin-bottom: 5px;">UPEI HEALTH &amp; SAFETY INCIDENT REPORT</div>
-              <div style="font-size: 10px; color: #666;">Contact: 902-566-0901 | incident@upei.ca</div>
-            </div>
-            
-            <div style="background: #84BD00; color: white; padding: 10px; font-weight: bold; margin-top: 20px;">Section A: Affected Party Information</div>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9;">
-                  <strong>Status:</strong><br>
-                  ${formData.hs_status_employee ? '☑ Employee' : '☐ Employee'} &nbsp;
-                  ${formData.hs_status_student ? '☑ Student' : '☐ Student'} &nbsp;
-                  ${formData.hs_status_visitor ? '☑ Visitor' : '☐ Visitor'} &nbsp;
-                  ${formData.hs_status_volunteer ? '☑ Volunteer' : '☐ Volunteer'} &nbsp;
-                  ${formData.hs_status_contractor ? '☑ Contractor' : '☐ Contractor'}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; border: 1px solid #ddd;">
-                  <strong>Initial:</strong> ${formData.hs_initial || 'N/A'}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9;">
-                  <strong>UPEI Job Title and Department:</strong><br>
-                  <span style="display: block; margin-top: 5px;">${formData.hs_job_title_department || 'N/A'}</span>
-                </td>
-              </tr>
-            </table>
-            
-            <div style="background: #84BD00; color: white; padding: 10px; font-weight: bold; margin-top: 20px;">Section B: Incident Details</div>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="width: 33%; padding: 8px; border: 1px solid #ddd;">
-                  <strong>Date:</strong><br>${formData.hs_date_of_incident || 'N/A'}
-                </td>
-                <td style="width: 33%; padding: 8px; border: 1px solid #ddd; background: #f9f9f9;">
-                  <strong>Time:</strong><br>${formData.hs_time_of_incident || 'N/A'}
-                </td>
-                <td style="width: 34%; padding: 8px; border: 1px solid #ddd;">
-                  <strong>Location:</strong><br>${formData.hs_location_of_incident || 'N/A'}
-                </td>
-              </tr>
-            </table>
-            
-            <div style="margin: 20px 0;">
-              <strong>Description of Incident:</strong><br>
-              <div style="border: 2px solid #ddd; padding: 15px; min-height: 100px; margin-top: 10px; background: #fafafa;">
-                ${formData.hs_incident_description || 'N/A'}
-              </div>
-            </div>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-              <tr>
-                <td style="padding: 8px; border: 1px solid #ddd;">
-                  <strong>Was first aid administered?</strong> ${formData.hs_first_aid_administered || 'N/A'}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9;">
-                  <strong>First Aid Details:</strong><br>
-                  ${formData.hs_first_aid_details || 'N/A'}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; border: 1px solid #ddd;">
-                  <strong>Reported to Supervisor:</strong> ${formData.hs_reported_to_supervisor || 'N/A'}
-                </td>
-              </tr>
-            </table>
-            
-            <div style="margin-top: 40px; border-top: 2px solid #8B0000; padding-top: 20px;">
-              <div style="font-size: 10px; color: #666;">
-                <strong>Report ID:</strong> ${sopState.reportId}<br>
-                <strong>Generated:</strong> ${new Date().toLocaleString()}
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      
-      else if (formKey === 'criminal') {
-        html = `
-          <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; background: white;">
-            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #8B0000; padding-bottom: 20px;">
-              <div style="font-size: 11px; color: #666; letter-spacing: 2px; margin-bottom: 8px;">UNIVERSITY OF PRINCE EDWARD ISLAND</div>
-              <div style="font-size: 16px; color: #8B0000; font-weight: bold; margin-bottom: 8px;">SECURITY SERVICES</div>
-              <div style="font-size: 18px; color: #8B0000; font-weight: bold;">CRIMINAL REFERRAL / POLICE SERVICES</div>
-            </div>
-            
-            <div style="background: #1A3A5C; color: white; padding: 12px; font-weight: bold; margin-bottom: 20px;">
-              REFERRAL TYPE
-            </div>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 15px; border: 2px solid #ddd; background: #f5f5f5;">
-                  <div style="font-size: 16px;">
-                    ${sopState.rcmpSelected ? '☑' : '☐'} <strong>RCMP (Royal Canadian Mounted Police)</strong>
-                  </div>
-                  <div style="font-size: 16px; margin-top: 10px;">
-                    ${sopState.cpsSelected ? '☑' : '☐'} <strong>CPS (Charlottetown Police Services)</strong>
-                  </div>
-                </td>
-              </tr>
-            </table>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="width: 50%; padding: 10px; border: 1px solid #ddd;">
-                  <strong>Date of Referral:</strong><br>
-                  <span style="display: block; margin-top: 5px;">${formData.criminal_date_of_referral || 'N/A'}</span>
-                </td>
-                <td style="width: 50%; padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
-                  <strong>Location:</strong><br>
-                  <span style="display: block; margin-top: 5px;">${formData.criminal_location || 'N/A'}</span>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2" style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>Investigating Officer:</strong><br>
-                  <span style="display: block; margin-top: 5px;">${formData.criminal_investigating_officer || 'N/A'}</span>
-                </td>
-              </tr>
-            </table>
-            
-            <div style="margin: 20px 0;">
-              <strong>Incident / Criminal Details:</strong><br>
-              <div style="border: 2px solid #000; padding: 15px; min-height: 120px; margin-top: 10px; background: #fff;">
-                ${formData.criminal_incident_details || 'N/A'}
-              </div>
-            </div>
-            
-            <div style="margin-top: 40px; border-top: 2px solid #8B0000; padding-top: 20px;">
-              <div style="font-size: 10px; color: #666;">
-                <strong>Report ID:</strong> ${sopState.reportId}<br>
-                <strong>Generated:</strong> ${new Date().toLocaleString()}
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      
-      else if (formKey === 'cctv') {
-        html = `
-          <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; background: white;">
-            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #8B0000; padding-bottom: 20px;">
-              <div style="font-size: 11px; color: #666; letter-spacing: 2px; margin-bottom: 8px;">UNIVERSITY OF PRINCE EDWARD ISLAND</div>
-              <div style="font-size: 16px; color: #8B0000; font-weight: bold; margin-bottom: 8px;">SECURITY SERVICES</div>
-              <div style="font-size: 18px; color: #8B0000; font-weight: bold;">CCTV ACCESS REQUEST FORM</div>
-            </div>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">
-                  <strong>Department:</strong> ${formData.cctv_department || 'N/A'}
-                </td>
-                <td style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>Request Date:</strong> ${formData.cctv_request_date || 'N/A'}
-                </td>
-              </tr>
-            </table>
-            
-            <div style="background: #1A3A5C; color: white; padding: 10px; font-weight: bold; margin: 20px 0 10px 0;">
-              REQUESTED BY POLICE SERVICES
-            </div>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd;">
-                  ${formData.cctv_requested_by_cps ? '☑' : '☐'} <strong>CPS</strong> &nbsp;&nbsp;&nbsp;
-                  ${formData.cctv_requested_by_rcmp ? '☑' : '☐'} <strong>RCMP</strong>
-                </td>
-              </tr>
-            </table>
-            
-            <div style="background: #1A3A5C; color: white; padding: 10px; font-weight: bold; margin: 20px 0 10px 0;">
-              REQUESTOR TYPE
-            </div>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
-                  ${formData.cctv_faculty ? '☑' : '☐'} Faculty &nbsp;&nbsp;
-                  ${formData.cctv_staff ? '☑' : '☐'} Staff &nbsp;&nbsp;
-                  ${formData.cctv_student ? '☑' : '☐'} Student &nbsp;&nbsp;
-                  ${formData.cctv_atip ? '☑' : '☐'} ATIP
-                </td>
-              </tr>
-            </table>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>Start Date/Time:</strong> ${formData.cctv_start_datetime || 'N/A'}
-                </td>
-                <td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
-                  <strong>Finish Date/Time:</strong> ${formData.cctv_finish_datetime || 'N/A'}
-                </td>
-              </tr>
-            </table>
-            
-            <div style="background: #1A3A5C; color: white; padding: 10px; font-weight: bold; margin: 20px 0 10px 0;">
-              REQUESTOR INFORMATION
-            </div>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Last Name:</strong> ${formData.cctv_requestor_last_name || 'N/A'}</td>
-                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9;"><strong>First Name:</strong> ${formData.cctv_requestor_first_name || 'N/A'}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Building:</strong> ${formData.cctv_building || 'N/A'}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Room:</strong> ${formData.cctv_room_number || 'N/A'}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Supervisor:</strong> ${formData.cctv_supervisor || 'N/A'}</td>
-                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Phone:</strong> ${formData.cctv_office_phone || 'N/A'}</td>
-              </tr>
-            </table>
-            
-            <div style="margin: 20px 0;">
-              <strong>CCTV Camera Review Requested:</strong><br>
-              <div style="border: 2px solid #ddd; padding: 15px; min-height: 80px; margin-top: 10px; background: #fafafa;">
-                ${formData.cctv_camera_review_requested || 'N/A'}
-              </div>
-            </div>
-            
-            <div style="margin-top: 40px; border-top: 2px solid #8B0000; padding-top: 20px;">
-              <div style="font-size: 10px; color: #666;">
-                <strong>Report ID:</strong> ${sopState.reportId}<br>
-                <strong>Generated:</strong> ${new Date().toLocaleString()}
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      
-      else if (formKey === 'poi') {
-        html = `
-          <div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; background: white;">
-            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #8B0000; padding-bottom: 20px;">
-              <div style="font-size: 11px; color: #666; letter-spacing: 2px; margin-bottom: 8px;">UNIVERSITY OF PRINCE EDWARD ISLAND</div>
-              <div style="font-size: 16px; color: #8B0000; font-weight: bold; margin-bottom: 8px;">SECURITY SERVICES</div>
-              <div style="font-size: 18px; color: #8B0000; font-weight: bold;">PERSON OF INTEREST (POI) FORM</div>
-            </div>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="width: 50%; padding: 10px; border: 1px solid #ddd; background: #f5f5f5;">
-                  <strong>Incident Date:</strong><br>${formData.poi_incident_date || 'N/A'}
-                </td>
-                <td style="width: 50%; padding: 10px; border: 1px solid #ddd;">
-                  <strong>Incident Type:</strong><br>${formData.poi_incident_type || 'N/A'}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>Occurrence #:</strong><br>${formData.poi_occurrence_number || 'N/A'}
-                </td>
-                <td style="padding: 10px; border: 1px solid #ddd; background: #f5f5f5;">
-                  <strong>Police File #:</strong><br>${formData.poi_police_file_number || 'N/A'}
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2" style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>Investigating Attendant:</strong><br>${formData.poi_investigating_attendant || 'N/A'}
-                </td>
-              </tr>
-            </table>
-            
-            <div style="background: #1A3A5C; color: white; padding: 10px; font-weight: bold; margin: 20px 0 10px 0;">
-              PERSON OF INTEREST DETAILS
-            </div>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
-                  <strong>Last Name:</strong> ${formData.poi_last_name || 'N/A'}
-                </td>
-                <td style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>First Name:</strong> ${formData.poi_first_name || 'N/A'}
-                </td>
-                <td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
-                  <strong>Middle Name:</strong> ${formData.poi_middle_name || 'N/A'}
-                </td>
-              </tr>
-              <tr>
-                <td colspan="3" style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>Date of Birth:</strong> ${formData.poi_dob || 'N/A'}
-                </td>
-              </tr>
-            </table>
-            
-            <div style="background: #1A3A5C; color: white; padding: 10px; font-weight: bold; margin: 20px 0 10px 0;">
-              ADDRESS
-            </div>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
-                  <strong>Street:</strong><br>${formData.poi_street || 'N/A'}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>City/Town:</strong> ${formData.poi_city_town || 'N/A'} &nbsp;&nbsp;
-                  <strong>Postal Code:</strong> ${formData.poi_postal_code || 'N/A'}
-                </td>
-              </tr>
-            </table>
-            
-            <div style="margin: 20px 0;">
-              <strong>Description of Incident:</strong><br>
-              <div style="border: 2px solid #ddd; padding: 15px; min-height: 100px; margin-top: 10px; background: #fafafa;">
-                ${formData.poi_description_of_incident || 'N/A'}
-              </div>
-            </div>
-            
-            <div style="background: #1A3A5C; color: white; padding: 10px; font-weight: bold; margin: 20px 0 10px 0;">
-              PREVIOUS INCIDENTS
-            </div>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;">
-                  <strong>Date:</strong> ${formData.poi_previous_incident_date || 'N/A'}
-                </td>
-                <td style="padding: 10px; border: 1px solid #ddd;">
-                  <strong>Occurrence:</strong> ${formData.poi_previous_occurrence || 'N/A'}
-                </td>
-              </tr>
-            </table>
-            
-            <div style="margin-top: 40px; border-top: 2px solid #8B0000; padding-top: 20px;">
-              <div style="font-size: 10px; color: #666;">
-                <strong>Report ID:</strong> ${sopState.reportId}<br>
-                <strong>Generated:</strong> ${new Date().toLocaleString()}
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      
-      return html;
-    }
-    
-    // === PDF EXPORT USING ORIGINAL FORM TEMPLATES ===
+    // === PDF EXPORT ===
     
     async function exportFormPDF(formKey) {
       // Validate dispatch log for incident reports
@@ -2556,135 +2008,185 @@ function setupAutoSaveListeners() {
         return;
       }
       
-      showToast('Generating official UPEI form PDF with your data...', 'info');
+      showToast('Generating professional PDF with images...', 'info');
       
       try {
-        // Generate HTML that matches the original UPEI form template
-        const originalFormHTML = generateOriginalFormHTML(formKey, fdata);
-        
-        // Create temporary container for rendering
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = originalFormHTML;
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.left = '-9999px';
-        tempDiv.style.top = '0';
-        tempDiv.style.width = '900px';
-        document.body.appendChild(tempDiv);
-        
-        // Use html2canvas to render the HTML form
-        const canvas = await html2canvas(tempDiv, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: '#ffffff',
-          logging: false,
-          width: 900,
-          windowWidth: 900
-        });
-        
-        // Remove temporary container
-        document.body.removeChild(tempDiv);
-        
-        // Create PDF from canvas
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
+        const doc = new jsPDF();
         
-        const imgData = canvas.toDataURL('image/png');
-        const pageWidth = 210; // A4 width in mm
-        const pageHeight = 297; // A4 height in mm
-        const imgWidth = pageWidth - 20; // Leave 10mm margin on each side
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        // Header with institutional styling
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text('UNIVERSITY OF PRINCE EDWARD ISLAND', 105, 15, { align: 'center' });
         
-        let heightLeft = imgHeight;
-        let position = 10;
+        doc.setFontSize(18);
+        doc.setTextColor(139, 0, 0);
+        doc.text('Security Services', 105, 23, { align: 'center' });
         
-        // Add first page
-        doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-        heightLeft -= (pageHeight - 20);
+        doc.setFontSize(12);
+        doc.setTextColor(212, 165, 116);
+        doc.text('Incident Reporting Portal', 105, 29, { align: 'center' });
         
-        // Add additional pages if needed
-        while (heightLeft > 0) {
-          position = heightLeft - imgHeight + 10;
-          doc.addPage();
-          doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-          heightLeft -= (pageHeight - 20);
+        // Gold line
+        doc.setDrawColor(212, 165, 116);
+        doc.setLineWidth(1);
+        doc.line(14, 32, 196, 32);
+        
+        doc.setFontSize(14);
+        doc.setTextColor(139, 0, 0);
+        doc.setFont(undefined, 'bold');
+        doc.text(form.title, 14, 42);
+        
+        // Report ID and timestamp
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Report ID: ${sopState.reportId}`, 14, 50);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 55);
+        if (formKey === 'criminal' && (sopState.rcmpSelected || sopState.cpsSelected)) {
+          const referralTypes = [];
+          if (sopState.rcmpSelected) referralTypes.push('RCMP');
+          if (sopState.cpsSelected) referralTypes.push('CPS');
+          doc.text(`Referral Type: ${referralTypes.join(', ')}`, 14, 60);
         }
         
-        // Add supporting evidence images on separate pages
+        // Line separator
+        doc.setDrawColor(217, 217, 217);
+        doc.setLineWidth(0.5);
+        doc.line(14, 59, 196, 59);
+        
+        let y = 67;
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        
+        // Form data with professional formatting
+        for (let k in fdata) {
+          if (k === '_files' || typeof fdata[k] === 'object') continue;
+          
+          // Format field name
+          let label = k.replace(/_/g, ' ')
+                        .replace(/\b\w/g, l => l.toUpperCase())
+                        .replace(/Hs /g, 'H&S ')
+                        .replace(/Poi /g, 'POI ')
+                        .replace(/Cctv /g, 'CCTV ');
+          
+          // Add subtle background for alternating fields
+          if (Object.keys(fdata).indexOf(k) % 2 === 0) {
+            doc.setFillColor(248, 248, 248);
+            doc.rect(14, y - 4, 182, 12, 'F');
+          }
+          
+          // Field label
+          doc.setFont(undefined, 'bold');
+          doc.setTextColor(139, 0, 0);
+          doc.text(`${label}:`, 16, y);
+          
+          // Field value with text wrapping
+          doc.setFont(undefined, 'normal');
+          doc.setTextColor(0, 0, 0);
+          const value = String(fdata[k] || 'N/A');
+          const lines = doc.splitTextToSize(value, 165);
+          
+          y += 6;
+          lines.forEach(line => {
+            if (y > 280) {
+              doc.addPage();
+              y = 20;
+            }
+            doc.text(line, 20, y);
+            y += 6;
+          });
+          
+          y += 4; // Space between fields
+          
+          if (y > 275) {
+            doc.addPage();
+            y = 20;
+          }
+        }
+        
+        // Add supporting evidence images
         if (fdata._files && Object.keys(fdata._files).length > 0) {
           doc.addPage();
+          y = 20;
           
-          // Evidence header
           doc.setFontSize(14);
           doc.setTextColor(139, 0, 0);
           doc.setFont(undefined, 'bold');
-          doc.text('Supporting Evidence - Attached Photos', 14, 20);
+          doc.text('Supporting Evidence - Attached Images', 14, y);
+          y += 10;
           
           doc.setDrawColor(212, 165, 116);
-          doc.setLineWidth(1);
-          doc.line(14, 25, 196, 25);
+          doc.setLineWidth(0.5);
+          doc.line(14, y, 196, y);
+          y += 10;
           
-          let yPos = 35;
+          doc.setFontSize(10);
+          doc.setFont(undefined, 'normal');
+          doc.setTextColor(0, 0, 0);
           
           for (let fieldName in fdata._files) {
             const fileData = fdata._files[fieldName];
             
-            if (yPos > 220) {
+            if (y > 200) {
               doc.addPage();
-              yPos = 20;
+              y = 20;
             }
             
             // Image label
-            doc.setFontSize(10);
-            doc.setTextColor(0, 0, 0);
             doc.setFont(undefined, 'bold');
-            doc.text(`Evidence Photo: ${fieldName.replace(/_/g, ' ')}`, 14, yPos);
+            doc.text(`Image: ${fieldName.replace(/_/g, ' ')}`, 14, y);
             doc.setFont(undefined, 'normal');
-            doc.setFontSize(8);
-            doc.text(`File: ${fileData.name}`, 14, yPos + 5);
-            yPos += 12;
+            doc.text(`File: ${fileData.name}`, 14, y + 5);
+            y += 10;
             
             // Add image
             try {
               const imgWidth = 170;
               const imgHeight = 100;
-              doc.addImage(fileData.data, 'JPEG', 20, yPos, imgWidth, imgHeight);
-              yPos += imgHeight + 15;
+              doc.addImage(fileData.data, 'JPEG', 20, y, imgWidth, imgHeight);
+              y += imgHeight + 15;
             } catch (imgError) {
-              console.error('Error embedding image:', imgError);
-              doc.setTextColor(200, 0, 0);
-              doc.text('[Image could not be embedded in PDF]', 20, yPos);
-              yPos += 10;
+              console.error('Error adding image:', imgError);
+              doc.text('[Image could not be embedded]', 20, y);
+              y += 10;
+            }
+            
+            if (y > 240) {
+              doc.addPage();
+              y = 20;
             }
           }
         }
         
-        // Add professional footer to all pages
-        const totalPages = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= totalPages; i++) {
+        // Professional footer on all pages
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
           doc.setPage(i);
           
+          // Gold line above footer
           doc.setDrawColor(212, 165, 116);
           doc.setLineWidth(0.5);
           doc.line(14, 282, 196, 282);
           
-          doc.setFontSize(7);
-          doc.setTextColor(120, 120, 120);
-          doc.text(`Page ${i} of ${totalPages}`, 14, 287);
-          doc.text('UPEI Security Services', 105, 287, { align: 'center' });
-          doc.setTextColor(139, 0, 0);
-          doc.setFont(undefined, 'bold');
+          doc.setFontSize(8);
+          doc.setTextColor(150, 150, 150);
+          doc.text(`Page ${i} of ${pageCount}`, 14, 287);
+          doc.text('University of Prince Edward Island - Security Services', 105, 287, { align: 'center' });
+          doc.text('Security: 902-566-0384 | security@upei.ca | Incidents: 902-566-0901 | incident@upei.ca', 105, 291, { align: 'center' });
+          doc.setTextColor(199, 68, 68);
           doc.text('CONFIDENTIAL', 196, 287, { align: 'right' });
         }
         
-        // Save PDF with official naming
+        // Save PDF
         const timestamp = new Date().toISOString().split('T')[0];
-        const filename = `UPEI_${form.title.replace(/\s/g, '_')}_${sopState.reportId}_${timestamp}.pdf`;
+        const filename = `UPEI_${form.title.replace(/\s/g, '_')}_${timestamp}.pdf`;
         doc.save(filename);
         
-        showToast(`Official UPEI form exported: ${filename}`, 'success');
+        showToast(`PDF exported: ${filename}`, 'success');
       } catch (error) {
         console.error('PDF generation error:', error);
-        showToast('Error generating PDF. Please try again.', 'error');
+        showToast('Error generating PDF', 'error');
       }
     }
     
@@ -2705,141 +2207,165 @@ function setupAutoSaveListeners() {
         }
       }
       
-      showToast('Generating comprehensive PDF with all official UPEI forms...', 'info');
+      showToast('Generating comprehensive PDF with all images...', 'info');
       
       try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        let isFirstForm = true;
         
-        // Process each form using original templates
+        // Header
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text('UNIVERSITY OF PRINCE EDWARD ISLAND', 105, 15, { align: 'center' });
+        
+        doc.setFontSize(18);
+        doc.setTextColor(139, 0, 0);
+        doc.text('Security Services', 105, 23, { align: 'center' });
+        
+        doc.setFontSize(12);
+        doc.setTextColor(212, 165, 116);
+        doc.text('Complete Incident Report', 105, 29, { align: 'center' });
+        
+        doc.setDrawColor(212, 165, 116);
+        doc.setLineWidth(1);
+        doc.line(14, 32, 196, 32);
+        
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Report ID: ${sopState.reportId}`, 14, 40);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 45);
+        
+        doc.setDrawColor(217, 217, 217);
+        doc.setLineWidth(0.5);
+        doc.line(14, 49, 196, 49);
+        
+        let y = 57;
+        
+        // Process each form
         const formKeys = Object.keys(sopState.forms);
-        
-        for (const formKey of formKeys) {
+        formKeys.forEach((formKey, index) => {
           const formData = sopState.forms[formKey];
           const formInfo = FORM_LIB[formKey];
           
-          // Add page break between forms (except for first form)
-          if (!isFirstForm) {
+          if (y > 60 && index > 0) {
             doc.addPage();
-          }
-          isFirstForm = false;
-          
-          // Generate HTML for this form using original template
-          const originalFormHTML = generateOriginalFormHTML(formKey, formData);
-          
-          // Create temporary container
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = originalFormHTML;
-          tempDiv.style.position = 'absolute';
-          tempDiv.style.left = '-9999px';
-          tempDiv.style.top = '0';
-          tempDiv.style.width = '900px';
-          document.body.appendChild(tempDiv);
-          
-          // Render to canvas
-          const canvas = await html2canvas(tempDiv, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#ffffff',
-            logging: false,
-            width: 900,
-            windowWidth: 900
-          });
-          
-          // Remove temporary container
-          document.body.removeChild(tempDiv);
-          
-          // Add canvas to PDF
-          const imgData = canvas.toDataURL('image/png');
-          const pageWidth = 210;
-          const pageHeight = 297;
-          const imgWidth = pageWidth - 20;
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
-          
-          let heightLeft = imgHeight;
-          let position = 10;
-          
-          // Add form pages
-          doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-          heightLeft -= (pageHeight - 20);
-          
-          while (heightLeft > 0) {
-            position = heightLeft - imgHeight + 10;
-            doc.addPage();
-            doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-            heightLeft -= (pageHeight - 20);
+            y = 20;
           }
           
-          // Add supporting evidence images for this form
-          if (formData._files && Object.keys(formData._files).length > 0) {
-            doc.addPage();
+          // Form title
+          doc.setFont(undefined, 'bold');
+          doc.setFontSize(14);
+          doc.setTextColor(139, 0, 0);
+          doc.text(formInfo.title, 14, y);
+          y += 10;
+          
+          doc.setFont(undefined, 'normal');
+          doc.setFontSize(10);
+          doc.setTextColor(0, 0, 0);
+          
+          // Form fields
+          for (let key in formData) {
+            if (key === '_files' || typeof formData[key] === 'object') continue;
             
-            doc.setFontSize(14);
+            let label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            
+            // Alternating background
+            if (Object.keys(formData).indexOf(key) % 2 === 0) {
+              doc.setFillColor(248, 248, 248);
+              doc.rect(14, y - 3, 182, 10, 'F');
+            }
+            
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(139, 0, 0);
+            doc.text(`${label}:`, 16, y);
+            
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            const value = String(formData[key] || 'N/A');
+            const lines = doc.splitTextToSize(value, 165);
+            
+            y += 5;
+            lines.forEach(line => {
+              if (y > 280) {
+                doc.addPage();
+                y = 20;
+              }
+              doc.text(line, 20, y);
+              y += 5;
+            });
+            
+            y += 3;
+            if (y > 275) {
+              doc.addPage();
+              y = 20;
+            }
+          }
+          
+          // Add images for this form
+          if (formData._files && Object.keys(formData._files).length > 0) {
+            if (y > 150) {
+              doc.addPage();
+              y = 20;
+            }
+            
+            doc.setFontSize(11);
             doc.setTextColor(139, 0, 0);
             doc.setFont(undefined, 'bold');
-            doc.text(`${formInfo.title} - Supporting Evidence`, 14, 20);
+            doc.text('Attached Images:', 14, y);
+            y += 8;
             
-            doc.setDrawColor(212, 165, 116);
-            doc.setLineWidth(1);
-            doc.line(14, 25, 196, 25);
-            
-            let yPos = 35;
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
             
             for (let fieldName in formData._files) {
               const fileData = formData._files[fieldName];
               
-              if (yPos > 220) {
+              if (y > 200) {
                 doc.addPage();
-                yPos = 20;
+                y = 20;
               }
               
-              doc.setFontSize(10);
-              doc.setTextColor(0, 0, 0);
-              doc.setFont(undefined, 'bold');
-              doc.text(`Photo: ${fieldName.replace(/_/g, ' ')}`, 14, yPos);
-              doc.setFont(undefined, 'normal');
-              doc.setFontSize(8);
-              doc.text(`File: ${fileData.name}`, 14, yPos + 5);
-              yPos += 12;
+              doc.text(`${fileData.name}`, 16, y);
+              y += 5;
               
               try {
-                const imgW = 170;
-                const imgH = 100;
-                doc.addImage(fileData.data, 'JPEG', 20, yPos, imgW, imgH);
-                yPos += imgH + 15;
+                const imgWidth = 160;
+                const imgHeight = 90;
+                doc.addImage(fileData.data, 'JPEG', 20, y, imgWidth, imgHeight);
+                y += imgHeight + 10;
               } catch (imgError) {
-                console.error('Error embedding image:', imgError);
-                doc.setTextColor(200, 0, 0);
-                doc.text('[Image could not be embedded]', 20, yPos);
-                yPos += 10;
+                console.error('Error adding image:', imgError);
+                doc.text('[Image could not be embedded]', 20, y);
+                y += 8;
+              }
+              
+              if (y > 240) {
+                doc.addPage();
+                y = 20;
               }
             }
           }
-        }
-        
-        // Add footer to all pages
-        const totalPages = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= totalPages; i++) {
-          doc.setPage(i);
           
+          y += 8;
+        });
+        
+        // Footer on all pages
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
           doc.setDrawColor(212, 165, 116);
           doc.setLineWidth(0.5);
           doc.line(14, 282, 196, 282);
-          
-          doc.setFontSize(7);
-          doc.setTextColor(120, 120, 120);
-          doc.text(`Page ${i} of ${totalPages}`, 14, 287);
-          doc.text('UPEI Security Services - Complete Report', 105, 287, { align: 'center' });
-          doc.setTextColor(139, 0, 0);
-          doc.setFont(undefined, 'bold');
-          doc.text('CONFIDENTIAL', 196, 287, { align: 'right' });
+          doc.setFontSize(8);
+          doc.setTextColor(150, 150, 150);
+          doc.text(`Page ${i} of ${pageCount}`, 14, 287);
+          doc.text('UPEI Security Services - Confidential', 105, 287, { align: 'center' });
         }
         
         const timestamp = new Date().toISOString().split('T')[0];
-        const filename = `UPEI_Complete_Report_${sopState.reportId}_${timestamp}.pdf`;
-        doc.save(filename);
-        showToast(`Complete report exported: ${filename}`, 'success');
+        doc.save(`UPEI_Complete_Report_${timestamp}.pdf`);
+        showToast('All forms exported as PDF', 'success');
       } catch (error) {
         console.error('PDF generation error:', error);
         showToast('Error generating PDF', 'error');
